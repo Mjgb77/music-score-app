@@ -5,6 +5,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -19,6 +22,13 @@ class MainActivity : AppCompatActivity() {
                 val db = DatabaseHelper(this)
                 db.addScore(scoreTitle)
         }
+        recyclerView = findViewById(R.id.recyclerView);
+
+        musicScoreAdapter = MusicScoreAdapter(this, DatabaseHelper(this).getAllScores())
+
+        recyclerView?.adapter = musicScoreAdapter
+        recyclerView?.layoutManager = LinearLayoutManager(this)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -35,5 +45,10 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    companion object {
+        private var recyclerView : RecyclerView? = null
+        private var musicScoreAdapter: MusicScoreAdapter? = null
     }
 }

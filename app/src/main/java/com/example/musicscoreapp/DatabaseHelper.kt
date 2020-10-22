@@ -2,6 +2,7 @@ package com.example.musicscoreapp
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
@@ -30,6 +31,19 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         }
     }
 
+    fun getAllScores(): ArrayList<MusicScore> {
+        val result = ArrayList<MusicScore>()
+        val cursor = this.writableDatabase.rawQuery("SELECT * FROM $TABLE_MUSIC_SCORES", null)
+
+        while (cursor.moveToNext()){
+            val score = MusicScore()
+            score.id = cursor.getInt(0)
+            score.title = cursor.getString(1)
+            result.add(score);
+        }
+
+        return result;
+    }
 
     companion object {
         private const val DATABASE_NAME = "MusicScores.db"
