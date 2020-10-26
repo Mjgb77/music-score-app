@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Music Score App</string>
+    <string name="add_score">Add Score</string>
     <string name="action_settings">Settings</string>
 </resources>

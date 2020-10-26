@@ -1,14 +1,13 @@
 package com.example.musicscoreapp
 
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.random.Random
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,11 +15,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-
-                val scoreTitle = "My Score #" + Random(System.nanoTime()).nextInt(1, 1000000);
-                val db = DatabaseHelper(this)
-                db.addScore(scoreTitle)
+        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { _ ->
+            val intent = Intent(this, AddScoreActivity::class.java)
+            startActivity(intent)
         }
         recyclerView = findViewById(R.id.recyclerView);
 

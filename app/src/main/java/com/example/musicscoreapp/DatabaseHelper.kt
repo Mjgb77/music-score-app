@@ -18,6 +18,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
     }
 
     fun addScore(title: String){
+        //TODO validate that there is not another score with the same title
         val db =  this.writableDatabase;
         val cv =  ContentValues();
 
