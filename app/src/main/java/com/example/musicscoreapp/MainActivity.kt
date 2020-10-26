@@ -2,10 +2,13 @@ package com.example.musicscoreapp
 
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,11 +16,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
-
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+
+                val scoreTitle = "My Score #" + Random(System.nanoTime()).nextInt(1, 1000000);
+                val db = DatabaseHelper(this)
+                db.addScore(scoreTitle)
         }
+        recyclerView = findViewById(R.id.recyclerView);
+
+        musicScoreAdapter = MusicScoreAdapter(this, DatabaseHelper(this).getAllScores())
+
+        recyclerView?.adapter = musicScoreAdapter
+        recyclerView?.layoutManager = LinearLayoutManager(this)
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -34,5 +45,10 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    companion object {
+        private var recyclerView : RecyclerView? = null
+        private var musicScoreAdapter: MusicScoreAdapter? = null
     }
 }
