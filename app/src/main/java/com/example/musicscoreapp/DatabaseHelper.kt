@@ -46,6 +46,12 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         return result;
     }
 
+    fun getScoreCount(): Int {
+        val cursor = this.writableDatabase.rawQuery("SELECT COUNT(*) FROM $TABLE_MUSIC_SCORES", null)
+        cursor.moveToNext();
+        return cursor.getInt(0);
+    }
+
     companion object {
         private const val DATABASE_NAME = "MusicScores.db"
         private const val DATABASE_VERSION = 1

@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         }
         recyclerView = findViewById(R.id.recyclerView);
 
-        musicScoreAdapter = MusicScoreAdapter(this, DatabaseHelper(this).getAllScores())
+        musicScoreAdapter = MusicScoreAdapter(this)
 
         recyclerView?.adapter = musicScoreAdapter
         recyclerView?.layoutManager = LinearLayoutManager(this)

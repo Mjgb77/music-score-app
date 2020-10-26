@@ -9,10 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicscoreapp.MusicScoreAdapter.MyViewHolder
 import java.util.*
 
-class MusicScoreAdapter internal constructor(private val context: Context, private val musicScores: ArrayList<MusicScore>) : RecyclerView.Adapter<MyViewHolder>() {
+class MusicScoreAdapter internal constructor(private val context: Context, private val databaseHelper: DatabaseHelper = DatabaseHelper(context),  private var musicScores: ArrayList<MusicScore> = databaseHelper.getAllScores())
+
+    : RecyclerView.Adapter<MyViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.music_score_row, parent, false)
+
         return MyViewHolder(view)
     }
 
@@ -21,6 +24,10 @@ class MusicScoreAdapter internal constructor(private val context: Context, priva
     }
 
     override fun getItemCount(): Int {
+        if(musicScores.size != databaseHelper.getScoreCount()){
+            musicScores = databaseHelper.getAllScores()
+        }
+
         return musicScores.size
     }
 
