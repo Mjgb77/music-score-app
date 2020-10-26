@@ -18,6 +18,7 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
     }
 
     fun addScore(title: String){
+        //TODO validate that there is not another score with the same title
         val db =  this.writableDatabase;
         val cv =  ContentValues();
 
@@ -43,6 +44,12 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         }
 
         return result;
+    }
+
+    fun getScoreCount(): Int {
+        val cursor = this.writableDatabase.rawQuery("SELECT COUNT(*) FROM $TABLE_MUSIC_SCORES", null)
+        cursor.moveToNext();
+        return cursor.getInt(0);
     }
 
     companion object {
