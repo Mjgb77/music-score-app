@@ -1,11 +1,9 @@
 package com.example.musicscoreapp
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import androidx.recyclerview.widget.RecyclerView
 
 class AddScoreActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,8 +21,11 @@ class AddScoreActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val databaseHelper = DatabaseHelper(this)
-            databaseHelper.addScore(title)
+            val fileStorageHelper = FileStorageHelper(this)
+            if(!fileStorageHelper.addScore(title)){
+                titleInput?.error = "Couldn't create the song, check if a song with this name already exists"
+                return@setOnClickListener
+            }
             finish()
         }
     }

@@ -12,9 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicscoreapp.MusicScoreAdapter.MyViewHolder
 import java.util.*
 
-class MusicScoreAdapter internal constructor(private val context: Context, private val activity: Activity, private val databaseHelper: DatabaseHelper = DatabaseHelper(context), private var musicScores: ArrayList<MusicScore> = databaseHelper.getAllScores())
-
+class MusicScoreAdapter internal constructor(private val context: Context, private val activity: Activity)
     : RecyclerView.Adapter<MyViewHolder>() {
+
+    private val fileStorageHelper: FileStorageHelper = FileStorageHelper(context)
+    private var musicScores: ArrayList<MusicScore> = fileStorageHelper.getAllScores()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.music_score_row, parent, false)
@@ -29,14 +32,14 @@ class MusicScoreAdapter internal constructor(private val context: Context, priva
 
         holder.mainLayout.setOnClickListener { _->
             val intent = Intent(context, ScoreDetailsActivity::class.java)
-            intent.putExtra("id", musicScore.id)
+            intent.putExtra("scoreTitle", musicScore.title)
             activity.startActivityForResult(intent, 1)
         }
     }
 
     override fun getItemCount(): Int {
-        if(musicScores.size != databaseHelper.getScoreCount()){
-            musicScores = databaseHelper.getAllScores()
+       if(musicScores.size != fileStorageHelper.getScoreCount()){
+            musicScores = fileStorageHelper.getAllScores()
         }
 
         return musicScores.size
@@ -45,7 +48,5 @@ class MusicScoreAdapter internal constructor(private val context: Context, priva
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val txtTitle: TextView = itemView.findViewById(R.id.txt_title)
         internal val mainLayout: LinearLayout = itemView.findViewById(R.id.mainLayout)
-
-
     }
 }
