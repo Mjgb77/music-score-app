@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         }
         recyclerView = findViewById(R.id.recyclerView);
 
-        musicScoreAdapter = MusicScoreAdapter(this)
+        musicScoreAdapter = MusicScoreAdapter(this, this)
 
         recyclerView?.adapter = musicScoreAdapter
         recyclerView?.layoutManager = LinearLayoutManager(this)
@@ -41,6 +41,13 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == 1){
+            recreate()
         }
     }
 

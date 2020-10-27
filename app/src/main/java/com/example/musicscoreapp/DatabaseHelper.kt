@@ -52,6 +52,27 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
         return cursor.getInt(0);
     }
 
+    fun getById(id: Int): MusicScore {
+        val cursor = this.writableDatabase.rawQuery("SELECT * FROM $TABLE_MUSIC_SCORES WHERE _id = ?", arrayOf(id.toString()))
+        cursor.moveToNext();
+
+        val result = MusicScore()
+        result.id = cursor.getInt(0)
+        result.title = cursor.getString(1)
+
+        return result
+    }
+
+    fun deleteScore(id: Int) {
+        val result =  writableDatabase.delete(TABLE_MUSIC_SCORES, "_id=?", arrayOf(id.toString()));
+
+        if(result == -1){
+            Toast.makeText(context,  "Deletion failed", Toast.LENGTH_SHORT).show()
+        }else {
+            Toast.makeText(context, "Deletion success", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     companion object {
         private const val DATABASE_NAME = "MusicScores.db"
         private const val DATABASE_VERSION = 1
