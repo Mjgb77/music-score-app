@@ -1,5 +1,6 @@
 package com.example.musicscoreapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -27,6 +28,11 @@ class AddScoreActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             finish()
+        }
+
+        findViewById<Button>(R.id.camera_button)?.setOnClickListener {_ ->
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
         }
     }
 
