@@ -31,7 +31,7 @@ class AddScoreActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.camera_button)?.setOnClickListener {_ ->
-            val intent = Intent(this, CameraActivity::class.java)
+            val intent = Intent(this, DetectorActivity::class.java)
             startActivity(intent)
         }
     }

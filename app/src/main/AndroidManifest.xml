@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.musicscoreapp">
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +10,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicScoreApp">
+        <activity
+            android:name=".DetectorActivity"
+            android:theme="@style/Theme.MusicScoreApp.FullScreen"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+        </activity>
         <activity android:name=".CameraActivity"
             android:launchMode="singleTask"
             android:parentActivityName=".AddScoreActivity"
