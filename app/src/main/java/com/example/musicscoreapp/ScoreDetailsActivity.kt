@@ -19,9 +19,13 @@ class ScoreDetailsActivity : AppCompatActivity() {
         titleInputDetails = findViewById(R.id.title_input_details)
 
         //Get the score
-        val databaseHelper = DatabaseHelper(this)
-        score = databaseHelper.getById(id)
+        val fileStorageHelper = FileStorageHelper(this)
+        score = fileStorageHelper.getByTitle(scoreTitle)
 
+        if(score == null){
+            Toast.makeText(this, "Score not found", Toast.LENGTH_LONG)
+            finish()
+        }
 
         titleInputDetails?.setText(score?.title)
         supportActionBar?.title = score?.title
@@ -45,7 +49,7 @@ class ScoreDetailsActivity : AppCompatActivity() {
         dialogBuilder.setTitle("Delete ${score?.title}?")
         dialogBuilder.setMessage("Are you sure you want to delete ${score?.title}?")
         dialogBuilder.setPositiveButton("Yes", DialogInterface.OnClickListener{ _,_ ->
-            DatabaseHelper(this).deleteScore(score?.id as Int)
+            FileStorageHelper(this).deleteScore(score?.title)
             finish()
         })
         dialogBuilder.setNegativeButton("No", DialogInterface.OnClickListener{_,_ -> })
@@ -53,8 +57,8 @@ class ScoreDetailsActivity : AppCompatActivity() {
     }
 
    private fun fillIntentData(){
-        if(intent.hasExtra("id")){
-            id = intent.getIntExtra("id",0)
+        if(intent.hasExtra("scoreTitle")){
+            scoreTitle = intent.getStringExtra("scoreTitle")
         }else{
             Toast.makeText(this, "No data", Toast.LENGTH_LONG)
             finish()
@@ -63,7 +67,7 @@ class ScoreDetailsActivity : AppCompatActivity() {
 
     companion object{
         private var titleInputDetails : EditText? = null
-        private var id: Int = 0
+        private var scoreTitle: String? = null
         private var score: MusicScore? = null
     }
 }
