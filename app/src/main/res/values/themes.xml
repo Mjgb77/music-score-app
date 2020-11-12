@@ -19,10 +19,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.MusicScoreApp.FullScreen" parent="Theme.MusicScoreApp.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-    </style>
-
     <style name="Theme.MusicScoreApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.MusicScoreApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
