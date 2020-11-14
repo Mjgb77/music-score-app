@@ -4,11 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.opensooq.supernova.gligar.GligarPicker
-import kotlinx.coroutines.selects.select
 
 class AddScoreActivity : AppCompatActivity() {
     private var titleInput : EditText? = null
@@ -38,13 +38,17 @@ class AddScoreActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val fileStorageHelper = FileStorageHelper(this)
-            if(!fileStorageHelper.addScore(title, selectedImages!!)){
-                titleInput?.error = "Couldn't create the song, check if a song with this name already exists"
-                return@setOnClickListener
+            Toast.makeText(this,"Generating Midi file... Please wait", Toast.LENGTH_LONG).show()
+            DetectionHelper(this).readMidi (selectedImages!!) { s ->
+                run {
+                    val fileStorageHelper = FileStorageHelper(this)
+                    if (!fileStorageHelper.addScore(title, selectedImages!!, s)) {
+                        titleInput?.error = "Couldn't create the song, check if a song with this name already exists"
+                        return@run
+                    }
+                    finish()
+                }
             }
-
-            finish()
         }
 
         selectImageButton?.setOnClickListener {
