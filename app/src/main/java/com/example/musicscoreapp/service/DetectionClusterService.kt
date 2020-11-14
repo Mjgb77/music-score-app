@@ -23,7 +23,7 @@ open class DetectionClusterService(
     private val cpuDetectionService = DetectionService(context, anchors, masks, modelFilename, labelFilename, DetectionService.Engine.CPU, confidenceThreshold, numThreads)
     private val gpuDetectionService =
             if (gpuModelFilename != null)
-                DetectionService(context, anchors, masks, gpuModelFilename, labelFilename, DetectionService.Engine.GPU, confidenceThreshold, 1)
+                DetectionService(context, anchors, masks, gpuModelFilename, labelFilename, DetectionService.Engine.CPU, confidenceThreshold, 1)
             else
                 null
 

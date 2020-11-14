@@ -10,7 +10,7 @@ class FileStorageHelper(private val context: Context) {
         appDirectory = context.getExternalFilesDir("Scores")
    }
 
-    fun addScore(title: String, images : Array<String>) : Boolean{
+    fun addScore(title: String, images : Array<String>, midiPath: String) : Boolean{
         val path = File(appDirectory, title)
 
         //Create the directory
@@ -18,13 +18,18 @@ class FileStorageHelper(private val context: Context) {
 
         return if(dirCreated){
             var i = 1
+            //Copy images
             for (image in images){
                 //TODO check for possible errors
-                val imageFile = File(image);
+                val imageFile = File(image)
                 val newFileName = "$i.${imageFile.extension}"
                 imageFile.copyTo(File(path,newFileName))
                 i++
             }
+
+            //Copy midi
+            val midiFile = File(midiPath)
+            midiFile.copyTo(File(path,"audio.${midiFile.extension}"))
 
             Toast.makeText(context, "$title added", Toast.LENGTH_SHORT).show()
             true
