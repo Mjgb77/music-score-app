@@ -9,9 +9,15 @@ import kotlin.math.min
 
 object StaffToMidi {
 
-    fun getBarline(lRecognition: List<Recognition>): Recognition? {
-//        var barlineRef: Recognition = lRecognition.first {it.title.startsWith("barline")}
-        return lRecognition.firstOrNull {it.title.startsWith("barline")}
+    fun getBarline(lRecognition: List<MusicalObject>): RectF? {
+        val barlinesLoc = lRecognition.filter { it is Barline }.map { (it as Barline).bar.location }
+        if (barlinesLoc.isEmpty()) return null
+        return RectF(
+            barlinesLoc.map { it.left }.average().toFloat(),
+            barlinesLoc.map { it.top }.average().toFloat(),
+            barlinesLoc.map { it.right }.average().toFloat(),
+            barlinesLoc.map { it.bottom }.average().toFloat()
+        )
     }
 
     fun distRect(a: RectF, b: RectF): Float {
@@ -64,8 +70,8 @@ object StaffToMidi {
         }
         val musicalObjects = map.values.map { g -> MusicalObjectFactory.parse(g) }.flatten().sortedBy { it.posX() }
 
-        val barlineRef = getBarline(lRecognition) ?: return
-        val pitchContext = PitchContext(barlineRef = barlineRef.location)
+        val barlineRef = getBarline(musicalObjects) ?: return
+        val pitchContext = PitchContext(barlineRef = barlineRef)
 
 //    var deltaRest = delta;
         for (obj in musicalObjects) {
