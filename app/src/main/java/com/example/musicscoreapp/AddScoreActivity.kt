@@ -16,6 +16,8 @@ class AddScoreActivity : AppCompatActivity() {
     private var selectImageButton: Button? = null
     private var selectedImages: Array<String>? = null
 
+    private val detectionHelper = DetectionHelper(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_score)
@@ -39,7 +41,7 @@ class AddScoreActivity : AppCompatActivity() {
             }
 
             Toast.makeText(this,"Generating Midi file... Please wait", Toast.LENGTH_LONG).show()
-            DetectionHelper(this).readMidi (selectedImages!!) { s ->
+            detectionHelper.readMidi (selectedImages!!) { s ->
                 run {
                     val fileStorageHelper = FileStorageHelper(this)
                     if (!fileStorageHelper.addScore(title, selectedImages!!, s)) {
@@ -69,7 +71,7 @@ class AddScoreActivity : AppCompatActivity() {
             PICKER_REQUEST_CODE -> {
                 selectedImages = data?.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
                 if(selectedImages!= null && selectedImages!!.isNotEmpty())
-                    selectImageButton?.error = null;
+                    selectImageButton?.error = null
             }
         }
 

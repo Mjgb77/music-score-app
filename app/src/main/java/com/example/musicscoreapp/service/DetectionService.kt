@@ -24,14 +24,13 @@ import kotlin.math.pow
 import kotlin.system.measureTimeMillis
 
 open class DetectionService(
-        private val context: Activity,
-        private val anchors: IntArray,
-        private val masks: Array<IntArray>,
-        private val modelFilename: String,
-        private val labelFilename: String,
-        private val engine: Engine = Engine.CPU,
-        private val confidenceThreshold: Float = 0.8F,
-        private val numThreads: Int = 1
+    private val anchors: IntArray,
+    private val masks: Array<IntArray>,
+    private val modelFilename: String,
+    private val labelFilename: String,
+    private val engine: Engine = Engine.CPU,
+    private val confidenceThreshold: Float = 0.8F,
+    private val numThreads: Int = 1
 ) {
     enum class Engine { CPU, GPU, NNAPI }
     private enum class InitializeStage { NOT_STARTED, IN_PROCESS, DONE }
@@ -79,7 +78,7 @@ open class DetectionService(
     private var oup_scales: FloatArray = floatArrayOf()
     private var oup_zero_points: IntArray = intArrayOf()
 
-    suspend fun initialize() {
+    suspend fun initialize(context: Activity) {
         withContext(Dispatchers.IO) {
             if (initializeStage == InitializeStage.NOT_STARTED) {
                 initializeStage = InitializeStage.IN_PROCESS
@@ -206,8 +205,6 @@ open class DetectionService(
                 }
             }
 
-//            var pq:
-
             //2.do non maximum suppression
             while (pq.size > 0) {
                 //insert detection with max confidence
@@ -274,12 +271,15 @@ open class DetectionService(
         }
         return withContext(Dispatchers.IO) {
             val adjusted = ImageUtils.adjustImageToSize(bitmap, inputSize)
-            recognizeImageBlocking(adjusted.bmp).map { r ->
-                Recognition(r.id, r.title, r.confidence, adjusted.reverser.invoke(r.location), r.detectedClass)
-            }
+            recognizeImageBlocking(adjusted.bmp)
+                .map { r ->
+                    Recognition(r.id, r.title, r.confidence, adjusted.reverser.invoke(r.location), r.detectedClass)
+                }
+                .map { postProcess(it, bitmap) }
         }
     }
-    private fun recognizeImageBlocking(bitmap: Bitmap): ArrayList<Recognition> {
+    private fun recognizeImageBlocking(img: Bitmap): List<Recognition> {
+        val bitmap = img
         //
         // 1. Prepare TFLite Input
         //
@@ -314,14 +314,14 @@ open class DetectionService(
                 val numClass = shape[shape.size - 1]
                 for (i in masks.indices) {
                     outData.add(
-                            ByteBuffer.allocateDirect(
-                                    1
-                                            * outputWidth.get(i).width
-                                            * outputWidth.get(i).height
-                                            * masks[i].size
-                                            * (5 + numClass)
-                                            * numBytesPerChannel
-                            )
+                        ByteBuffer.allocateDirect(
+                            1
+                                    * outputWidth.get(i).width
+                                    * outputWidth.get(i).height
+                                    * masks[i].size
+                                    * (5 + numClass)
+                                    * numBytesPerChannel
+                        )
                     )
                     outData.get(i).order(ByteOrder.nativeOrder())
                 }
@@ -368,8 +368,8 @@ open class DetectionService(
                             for (x in 0 until gridSize.width) {
                                 for (c in 0 until 5 + labels.size) {
                                     out[0][b][y * gridSize.width + x][c] =
-                                            oup_scales[i] * ((byteBuffer.get()
-                                                    .toInt() and 0xFF) - oup_zero_points[i])
+                                        oup_scales[i] * ((byteBuffer.get()
+                                            .toInt() and 0xFF) - oup_zero_points[i])
                                 }
                             }
                         }
@@ -391,9 +391,9 @@ open class DetectionService(
                     for (x in 0 until gridSize.width) {
                         for (b in 0 until NUM_BOXES_PER_BLOCK) {
                             val offset: Int =
-                                    ((gridSize.width * (NUM_BOXES_PER_BLOCK * (labels.size + 5))) * y
-                                            ) + ((NUM_BOXES_PER_BLOCK * (labels.size + 5)) * x
-                                            ) + ((labels.size + 5) * b)
+                                ((gridSize.width * (NUM_BOXES_PER_BLOCK * (labels.size + 5))) * y
+                                        ) + ((NUM_BOXES_PER_BLOCK * (labels.size + 5)) * x
+                                        ) + ((labels.size + 5) * b)
                             val confidence: Float = expit(out[0][b][y * gridSize.width + x][4])
                             var detectedClassIndex = -1
                             var maxClass = 0f
@@ -410,29 +410,29 @@ open class DetectionService(
                             val confidenceInClass = maxClass * confidence
                             if (confidenceInClass > confidenceThreshold) {
                                 val xPos: Float =
-                                        (x + expit(out[0][b][y * gridSize.width + x][0]) * 2f - 0.5f) * (1.0f * inputSize.width / gridSize.width)
+                                    (x + expit(out[0][b][y * gridSize.width + x][0]) * 2f - 0.5f) * (1.0f * inputSize.width / gridSize.width)
                                 val yPos: Float =
-                                        (y + expit(out[0][b][y * gridSize.width + x][1]) * 2f - 0.5f) * (1.0f * inputSize.height / gridSize.height)
+                                    (y + expit(out[0][b][y * gridSize.width + x][1]) * 2f - 0.5f) * (1.0f * inputSize.height / gridSize.height)
                                 val w =
-                                        ((expit(out[0][b][y * gridSize.width + x][2]).toDouble() * 2).pow(
-                                                2.0
-                                        ) * anchors[2 * masks[i][b]]).toFloat()
+                                    ((expit(out[0][b][y * gridSize.width + x][2]).toDouble() * 2).pow(
+                                        2.0
+                                    ) * anchors[2 * masks[i][b]]).toFloat()
                                 val h =
-                                        (Math.pow(
-                                                expit(out[0][b][y * gridSize.width + x][3]).toDouble() * 2,
-                                                2.0
-                                        ) * anchors[2 * masks[i][b] + 1]).toFloat()
+                                    (Math.pow(
+                                        expit(out[0][b][y * gridSize.width + x][3]).toDouble() * 2,
+                                        2.0
+                                    ) * anchors[2 * masks[i][b] + 1]).toFloat()
                                 val rect = RectF(
-                                        Math.max(0f, xPos - w / 2),
-                                        Math.max(0f, yPos - h / 2),
-                                        Math.min(bitmap.width - 1.toFloat(), xPos + w / 2),
-                                        Math.min(bitmap.height - 1.toFloat(), yPos + h / 2)
+                                    Math.max(0f, xPos - w / 2),
+                                    Math.max(0f, yPos - h / 2),
+                                    Math.min(bitmap.width - 1.toFloat(), xPos + w / 2),
+                                    Math.min(bitmap.height - 1.toFloat(), yPos + h / 2)
                                 )
                                 detections.add(
-                                        Recognition(
-                                                "" + offset, labels[detectedClassIndex],
-                                                confidenceInClass, rect, detectedClassIndex
-                                        )
+                                    Recognition(
+                                        "" + offset, labels[detectedClassIndex],
+                                        confidenceInClass, rect, detectedClassIndex
+                                    )
                                 )
                             }
                         }
@@ -445,6 +445,13 @@ open class DetectionService(
         return nms(detections)
     }
 
+    fun postProcess(recognition: Recognition, bitmap: Bitmap): Recognition {
+        return when (recognition.title) {
+            "barline" -> ObjectAdjustments.adjustBarline(recognition, bitmap)
+            else -> recognition
+        }
+    }
+
     private fun expit(x: Float) : Float {
         return (1.0 / (1.0 + Math.exp(-x.toDouble()))).toFloat()
     }
@@ -453,9 +460,10 @@ open class DetectionService(
     private fun loadModelFile(assets: AssetManager, modelFilename: String?): ByteBuffer {
         val fileDescriptor = assets.openFd(modelFilename!!)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
-        val fileChannel: FileChannel = inputStream.getChannel()
+        val fileChannel: FileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
         val declaredLength = fileDescriptor.declaredLength
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
+
 }

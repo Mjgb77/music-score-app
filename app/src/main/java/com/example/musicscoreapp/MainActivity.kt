@@ -7,19 +7,22 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.musicscoreapp.service.DetectionClusterInstances
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DetectionClusterInstances.init(this)
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { _ ->
             val intent = Intent(this, AddScoreActivity::class.java)
             startActivity(intent)
         }
-        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView)
 
         musicScoreAdapter = MusicScoreAdapter(this, this)
 

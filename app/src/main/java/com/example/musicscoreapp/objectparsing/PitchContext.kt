@@ -3,7 +3,7 @@ package com.example.musicscoreapp.objectparsing
 import android.graphics.RectF
 import kotlin.math.round
 
-class PitchContext (val barlineRef: RectF) {
+class PitchContext (var barlineRef: RectF) {
     private enum class ClefValues(val delta: Int) {
         F(4),
         C(10),
@@ -14,7 +14,7 @@ class PitchContext (val barlineRef: RectF) {
     private val accidentalByPos = HashMap<Int,Int>()
     private val keyAccidental = IntArray(7)
 
-    private val cMayorScale = intArrayOf(48, 50, 52, 53, 55, 57, 59)
+    private val cMayorScale = intArrayOf(36, 38, 40, 41, 43, 45, 47)
 
     private fun getPos (mObject: RectF):Int {
         val oy = mObject.centerY()
@@ -34,9 +34,9 @@ class PitchContext (val barlineRef: RectF) {
         return naturalPitch + (accidentalByPos[pos] ?: keyAccidental[note%7])
     }
 
-    fun setClef(clef: Clef) {
-        if (clef.clef.title == "clef.C") clefVal = ClefValues.C
-        if (clef.clef.title == "clef.F") clefVal = ClefValues.F
+    private fun setClef(clef: Clef) {
+        if (clef.clef.title == "clef.c") clefVal = ClefValues.C
+        if (clef.clef.title == "clef.f") clefVal = ClefValues.F
 
         for (obj in clef.accidentals) {
             val note = getNote(getPos(obj.location))
@@ -53,7 +53,7 @@ class PitchContext (val barlineRef: RectF) {
         }
     }
 
-    fun setAccidental(accidental: Accidental) {
+    private fun setAccidental(accidental: Accidental) {
         val pos = getPos(accidental.body.location)
 
         if (accidental.body.title == "sign.flat") {
@@ -67,8 +67,13 @@ class PitchContext (val barlineRef: RectF) {
         }
     }
 
+    private fun setBarline(barline: Barline) {
+        barlineRef = barline.bar.location
+        accidentalByPos.clear()
+    }
+
     fun process(musicalObject: MusicalObject) {
-        if (musicalObject is Barline) accidentalByPos.clear()
+        if (musicalObject is Barline) setBarline(musicalObject)
         if (musicalObject is Clef) setClef(musicalObject)
         if (musicalObject is Accidental) setAccidental(musicalObject)
     }
