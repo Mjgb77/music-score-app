@@ -3,14 +3,12 @@ package com.example.musicscoreapp
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.view.*
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicscoreapp.MusicScoreAdapter.MyViewHolder
 import java.util.*
+
 
 class MusicScoreAdapter internal constructor(private val context: Context, private val activity: Activity)
     : RecyclerView.Adapter<MyViewHolder>() {
@@ -35,6 +33,11 @@ class MusicScoreAdapter internal constructor(private val context: Context, priva
             intent.putExtra("scoreTitle", musicScore.title)
             activity.startActivityForResult(intent, 1)
         }
+
+        val btnMenu = holder.itemView.findViewById<ImageButton>(R.id.btn_score_menu);
+        btnMenu.setOnClickListener { _ ->
+            showPopupMenu(btnMenu, position);
+        }
     }
 
     override fun getItemCount(): Int {
@@ -48,5 +51,25 @@ class MusicScoreAdapter internal constructor(private val context: Context, priva
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val txtTitle: TextView = itemView.findViewById(R.id.txt_title)
         internal val mainLayout: LinearLayout = itemView.findViewById(R.id.mainLayout)
+    }
+
+    internal class MyMenuItemClickListener(private val position: Int) : PopupMenu.OnMenuItemClickListener {
+        override fun onMenuItemClick(menuItem: MenuItem): Boolean {
+            when (menuItem.itemId) {
+
+                else -> {
+                }
+            }
+            return false
+        }
+    }
+
+    private fun showPopupMenu(view: View, position: Int) {
+        // inflate menu
+        val popup = PopupMenu(view.context, view)
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.details_menu, popup.menu)
+        popup.setOnMenuItemClickListener(MyMenuItemClickListener(position))
+        popup.show()
     }
 }
