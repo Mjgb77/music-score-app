@@ -3,10 +3,18 @@ package com.example.musicscoreapp
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.view.*
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.PopupMenu
+import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.FileProvider.getUriForFile
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicscoreapp.MusicScoreAdapter.MyViewHolder
+import java.io.File
+import java.io.FileFilter
 import java.util.*
 
 
@@ -34,10 +42,36 @@ class MusicScoreAdapter internal constructor(private val context: Context, priva
             activity.startActivityForResult(intent, 1)
         }
 
-        val btnMenu = holder.itemView.findViewById<ImageButton>(R.id.btn_score_menu);
+        val btnMenu = holder.itemView.findViewById<ImageButton>(R.id.btn_score_menu)
         btnMenu.setOnClickListener { _ ->
-            showPopupMenu(btnMenu, position);
+            showPopupMenu(btnMenu, position)
         }
+
+        val btnPlay = holder.itemView.findViewById<ImageButton>(R.id.btn_play_main)
+        val scoreFolder = File(musicScore.path)
+
+        btnPlay.setOnClickListener { _ ->
+            val intent = Intent()
+            intent.action = Intent.ACTION_VIEW
+
+            //TODO use dynamically generated audio file name
+            val contentUri: Uri = getUriForFile(context, "com.example.musicscoreapp", File(scoreFolder.path, "audio.mid"))
+
+            intent.setDataAndType(contentUri, "audio/*")
+            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.startActivity(intent)
+        }
+
+        val imageView = holder.itemView.findViewById<AppCompatImageView>(R.id.img_score_preview)
+        //get first image
+        val firstImage = scoreFolder.listFiles(FileFilter { f -> f.nameWithoutExtension == "1" }).firstOrNull()
+
+        if(firstImage != null) {
+            //TODO crop and set bitmap
+         //   imageView.setImageURI(firstImage.path.toUri())
+        }
+
+
     }
 
     override fun getItemCount(): Int {

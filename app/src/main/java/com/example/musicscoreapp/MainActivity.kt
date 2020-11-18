@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         musicScoreAdapter = MusicScoreAdapter(this, this)
 
         recyclerView?.adapter = musicScoreAdapter
-        recyclerView?.layoutManager = GridLayoutManager(this,2)
+        recyclerView?.layoutManager = LinearLayoutManager(this)
 
     }
 
