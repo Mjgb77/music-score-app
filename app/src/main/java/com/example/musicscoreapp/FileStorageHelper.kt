@@ -47,6 +47,7 @@ class FileStorageHelper(private val context: Context) {
         files?.forEach { file ->
             val item = MusicScore()
             item.title = file
+            item.path = File(appDirectory,file).path
             result.add(item)
         }
 
@@ -59,10 +60,11 @@ class FileStorageHelper(private val context: Context) {
 
     fun getByTitle(title: String?): MusicScore? {
         if(title == null) return null
-
-        if(File(appDirectory,title).exists()){
+        val file = File(appDirectory,title)
+        if(file.exists()){
             val result = MusicScore()
             result.title = title
+            result.path = file.path;
             return result
         }
 
