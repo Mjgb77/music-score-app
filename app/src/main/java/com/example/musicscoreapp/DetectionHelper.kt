@@ -4,15 +4,12 @@ import android.app.Activity
 import android.graphics.*
 import android.os.Environment
 import android.util.Log
-import android.widget.ImageView
 import com.example.musicscoreapp.model.Recognition
 import com.example.musicscoreapp.model.StaffRecognition
 import com.example.musicscoreapp.objectparsing.StaffToMidi
 import com.example.musicscoreapp.service.DetectionClusterInstances
 import com.example.musicscoreapp.service.DetectionClusterInstances.figureDetectionService
 import com.example.musicscoreapp.service.DetectionClusterInstances.staffDetectionService
-import com.example.musicscoreapp.service.DetectionClusterService
-import com.example.musicscoreapp.service.ObjectAdjustments
 import com.example.musicscoreapp.service.PictureService
 import com.example.musicscoreapp.utils.ImageUtils
 import kotlinx.coroutines.*
@@ -59,7 +56,6 @@ class DetectionHelper(private val context: Activity) : CoroutineScope {
         launch {
             DetectionClusterInstances.init(context)
             val image = pictureService.readBitmap { File(images[0]).inputStream() }
-//            ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f)})
 
           /*  val paint = Paint().apply {
                 this.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f)})

@@ -85,9 +85,9 @@ object StaffToMidi {
 //    return delta
     }
 
-    fun staffToMidi(staffs: List<StaffRecognition>): ByteArray {
+    fun staffToMidi(staffs: List<StaffRecognition>, tempo: Int = 120, instrument: Byte = 0x1): ByteArray {
         val myTrack = Track()
-        myTrack.addEvent(0, ProgramChange(0x05))
+        myTrack.addEvent(0, ProgramChange(instrument))
 
         for (staff in staffs) {
             processStaff(staff, myTrack)
@@ -95,7 +95,7 @@ object StaffToMidi {
 
         val output = MidiWriter()
             .writeHeader()
-            .writeTrack(Track().addEvent(0, Tempo(120)))
+            .writeTrack(Track().addEvent(0, Tempo(tempo)))
             .writeTrack(myTrack)
             .toByteArray()
         return output

@@ -55,7 +55,7 @@ class MusicScoreAdapter internal constructor(private val context: Context, priva
             intent.action = Intent.ACTION_VIEW
 
             //TODO use dynamically generated audio file name
-            val contentUri: Uri = getUriForFile(context, "com.example.musicscoreapp", File(scoreFolder.path, "audio.mid"))
+            val contentUri: Uri = getUriForFile(context, "com.example.musicscoreapp.fileprovider", File(scoreFolder.path, "audio.mid"))
 
             intent.setDataAndType(contentUri, "audio/*")
             intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION

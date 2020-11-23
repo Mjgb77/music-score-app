@@ -15,7 +15,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DetectionClusterInstances.init(this)
+//        DetectionClusterInstances.init(this)
+        DetectionClusterInstances.init(applicationContext)
 
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))

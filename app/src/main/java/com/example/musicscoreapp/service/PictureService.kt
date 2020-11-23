@@ -1,6 +1,5 @@
 package com.example.musicscoreapp.service
 
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -10,7 +9,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.ExifInterface
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
@@ -19,8 +17,12 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import com.example.musicscoreapp.utils.ImageUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,23 +49,22 @@ class PictureService(private val context: Activity) : ViewModel() {
         return true
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    fun takePicture(callback: (Uri) -> Unit) {
+    fun takePicture(callback: (File) -> Unit) {
         val permissions = arrayOf(
                 CAMERA_PERMISSION,
                 READ_EXTERNAL_STORAGE_PERMISSION)
         val requestId = Random.nextInt(60000)
-        val file = createImageFile()
         if (!hasPermissions(context, *permissions)) {
             ActivityCompat.requestPermissions(context, permissions, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS)
         } else {
+            val file = createImageFile()
             try {
                 val pickImage = Intent(Intent.ACTION_GET_CONTENT).also {
                     it.type = "image/*"
                 }
                 val photoURI: Uri = FileProvider.getUriForFile(
                     context,
-                    "com.example.android.fileprovider",
+                    "com.example.musicscoreapp.fileprovider",
                     file)
                 val captureImage = Intent(MediaStore.ACTION_IMAGE_CAPTURE).also {
                     it.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
@@ -73,15 +74,15 @@ class PictureService(private val context: Activity) : ViewModel() {
                     it.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(captureImage))
                 }
 
-                unprocessedRequests[requestId] = TakePictureAction(callback, photoURI)
+                unprocessedRequests[requestId] = TakePictureAction(callback, file)
                 context.startActivityForResult(chooser, requestId)
             } catch (e: ActivityNotFoundException) {
             }
         }
     }
 
-    suspend fun readBitmap(image: Uri): Bitmap {
-        return readBitmap { context.contentResolver.openInputStream(image)!! }
+    suspend fun readBitmap(image: File): Bitmap {
+        return readBitmap { FileInputStream(image) }
     }
 
     suspend fun readBitmap(streamProvider: () -> InputStream): Bitmap {
@@ -108,9 +109,15 @@ class PictureService(private val context: Activity) : ViewModel() {
         if (unprocessedRequests.containsKey(requestCode)) {
             val action = unprocessedRequests.remove(requestCode)
             if (resultCode == AppCompatActivity.RESULT_OK && action != null) {
-                if (data?.data != null) {
-                    action.callback.invoke(data.data!!)
-                } else {
+                GlobalScope.launch(Dispatchers.IO) {
+                    if (data?.data != null) {
+                        context.contentResolver.openInputStream(data.data!!).use {
+                            val bitmapData = BitmapFactory.decodeStream(it)
+                            FileOutputStream(action.path).use {
+                                bitmapData.compress(Bitmap.CompressFormat.JPEG, 100, it)
+                            }
+                        }
+                    }
                     action.callback.invoke(action.path)
                 }
             }
@@ -121,10 +128,10 @@ class PictureService(private val context: Activity) : ViewModel() {
     private fun createImageFile(): File {
         // Create an image file name
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        return File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
-                ".jpg", /* suffix */
-                context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) /* directory */
+
+        return File(
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            "JPEG_${timeStamp}.jpg"
         )
     }
 
@@ -136,5 +143,5 @@ class PictureService(private val context: Activity) : ViewModel() {
 
     }
 
-    class TakePictureAction(val callback: (Uri) -> Unit, val path: Uri)
+    class TakePictureAction(val callback: (File) -> Unit, val path: File)
 }
