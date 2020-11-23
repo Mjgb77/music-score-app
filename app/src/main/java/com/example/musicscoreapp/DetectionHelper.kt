@@ -57,11 +57,11 @@ class DetectionHelper(private val context: Activity) : CoroutineScope {
             DetectionClusterInstances.init(context)
             val image = pictureService.readBitmap { File(images[0]).inputStream() }
 
-            val paint = Paint().apply {
+          /*  val paint = Paint().apply {
                 this.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f)})
             }
 
-            Canvas(image).drawBitmap(image, 0F, 0F, paint)
+            Canvas(image).drawBitmap(image, 0F, 0F, paint)*/
 
             Log.d("MY-DEB", "$PREFIX width:${image.width} height:${image.height}")
             val staffs = staffDetectionService.recognizeImage(image)
