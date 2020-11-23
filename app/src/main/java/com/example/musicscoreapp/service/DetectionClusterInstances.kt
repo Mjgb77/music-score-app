@@ -1,6 +1,7 @@
 package com.example.musicscoreapp.service
 
 import android.app.Activity
+import android.content.Context
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -25,14 +26,14 @@ object DetectionClusterInstances {
         numThreads = 4
     )
 
-    fun init(context: Activity) {
+    fun init(context: Context) {
         GlobalScope.launch {
             staffDetectionService.initializeCPU(context)
             figureDetectionService.initializeCPU(context)
 
-            //TODO: try-catch
-            staffDetectionService.initializeGPU(context)
-            figureDetectionService.initializeGPU(context)
+//            //TODO: try-catch
+//            staffDetectionService.initializeGPU(context)
+//            figureDetectionService.initializeGPU(context)
         }
     }
 }

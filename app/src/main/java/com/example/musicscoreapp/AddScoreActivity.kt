@@ -1,83 +1,90 @@
 package com.example.musicscoreapp
 
-import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.InputType
+import android.widget.AutoCompleteTextView
 import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
-import com.opensooq.supernova.gligar.GligarPicker
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.musicscoreapp.adapter.NoFilterArrayAdapter
+import com.example.musicscoreapp.adapter.SheetAdapter
+import com.example.musicscoreapp.databinding.ActivityAddScoreBinding
+import com.example.musicscoreapp.service.PictureService
+import com.example.musicscoreapp.service.ScoreToMidiConverter
+import kotlinx.coroutines.launch
+
 
 class AddScoreActivity : AppCompatActivity() {
-    private var titleInput : EditText? = null
-    private var addButton: Button? = null
-    private var selectImageButton: Button? = null
-    private var selectedImages: Array<String>? = null
+    private lateinit var addButton: Button
+    private lateinit var createButton: Button
 
-    private val detectionHelper = DetectionHelper(this)
+    private val pictureService = PictureService(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_score)
 
-        titleInput = findViewById(R.id.title_input)
-        addButton = findViewById(R.id.add_button)
-        selectImageButton = findViewById(R.id.select_images_button)
+        val scoreModel: AddScoreViewModel by viewModels()
+        val binding: ActivityAddScoreBinding = DataBindingUtil.setContentView(
+            this,
+            R.layout.activity_add_score
+        )
+        binding.viewmodel = scoreModel
 
-        addButton?.setOnClickListener { _ ->
-            val title = titleInput?.text.toString().trim()
 
-            if(title.isEmpty()){
-                titleInput?.error = "Title should not be blank"
-                return@setOnClickListener
-            }
+        addButton = findViewById(R.id.buttonAddImage)
+        createButton = findViewById(R.id.fabCreate)
 
-            if(selectedImages == null || selectedImages!!.isEmpty()){
-                //TODO show this error using another way
-                selectImageButton?.error = "Images must be selected before continue"
-                return@setOnClickListener
-            }
+        val adapter = NoFilterArrayAdapter(
+            this,
+            R.layout.dropdown_menu_popup_instrument,
+            scoreModel.instruments.keys.toTypedArray()
+        );
 
-            Toast.makeText(this,"Generating Midi file... Please wait", Toast.LENGTH_LONG).show()
-            detectionHelper.readMidi (selectedImages!!) { s ->
-                run {
-                    val fileStorageHelper = FileStorageHelper(this)
-                    if (!fileStorageHelper.addScore(title, selectedImages!!, s)) {
-                        titleInput?.error = "Couldn't create the song, check if a song with this name already exists"
-                        return@run
-                    }
-                    finish()
+        val editTextFilledExposedDropdown: AutoCompleteTextView =
+            findViewById(R.id.autoCompleteInstrument)
+        editTextFilledExposedDropdown.setAdapter(adapter)
+
+        val sheetAdapter = SheetAdapter(scoreModel)
+        val layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        val recyclerViewImages: RecyclerView = findViewById(R.id.recyclerViewImages)
+        recyclerViewImages.adapter = sheetAdapter
+        recyclerViewImages.layoutManager = layoutManager
+
+        addButton.setOnClickListener {
+            pictureService.takePicture { imageFile ->
+                lifecycleScope.launch {
+                    val image = pictureService.readBitmap(imageFile)
+                    sheetAdapter.add(image, imageFile)
+                    recyclerViewImages.scrollToPosition(sheetAdapter.itemCount - 1)
                 }
             }
         }
 
-        selectImageButton?.setOnClickListener {
-            _ ->
-            GligarPicker()
-                    .requestCode(PICKER_REQUEST_CODE)
-                    .withActivity(this)
-                    .show()
+        createButton.setOnClickListener {
+            scoreModel.setInstrumentName(editTextFilledExposedDropdown.text.toString())
+            scoreModel.createScore()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if(resultCode != Activity.RESULT_OK) return
-
-        when (requestCode){
-            PICKER_REQUEST_CODE -> {
-                selectedImages = data?.extras?.getStringArray(GligarPicker.IMAGES_RESULT)
-                if(selectedImages!= null && selectedImages!!.isNotEmpty())
-                    selectImageButton?.error = null
-            }
-        }
-
+        pictureService.handleActivityResult(requestCode, resultCode, data)
     }
 
-    companion object {
-        private const val PICKER_REQUEST_CODE = 1
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        pictureService.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

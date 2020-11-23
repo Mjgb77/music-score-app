@@ -1,6 +1,7 @@
 package com.example.musicscoreapp.service
 
 import android.app.Activity
+import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.RectF
@@ -78,7 +79,7 @@ open class DetectionService(
     private var oup_scales: FloatArray = floatArrayOf()
     private var oup_zero_points: IntArray = intArrayOf()
 
-    suspend fun initialize(context: Activity) {
+    suspend fun initialize(context: Context) {
         withContext(Dispatchers.IO) {
             if (initializeStage == InitializeStage.NOT_STARTED) {
                 initializeStage = InitializeStage.IN_PROCESS

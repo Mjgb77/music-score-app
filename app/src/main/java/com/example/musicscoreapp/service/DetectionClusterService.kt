@@ -1,6 +1,7 @@
 package com.example.musicscoreapp.service
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import com.example.musicscoreapp.model.Recognition
 import kotlinx.coroutines.*
@@ -42,11 +43,11 @@ open class DetectionClusterService(
         else
             null
 
-    suspend fun initializeCPU(context: Activity) {
+    suspend fun initializeCPU(context: Context) {
         cpuDetectionService.initialize(context)
     }
 
-    suspend fun initializeGPU(context: Activity) {
+    suspend fun initializeGPU(context: Context) {
 //        TODO: try-catch for gpu
         gpuDetectionService?.initialize(context)
     }

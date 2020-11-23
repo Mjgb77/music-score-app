@@ -3,38 +3,43 @@ package com.example.musicscoreapp
 import android.content.Context
 import android.os.FileUtils
 import android.widget.Toast
+import androidx.core.net.toFile
+import com.example.musicscoreapp.utils.Score
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 
 class FileStorageHelper(private val context: Context) {
    init {
         appDirectory = context.getExternalFilesDir("Scores")
    }
 
-    fun addScore(title: String, images : Array<String>, midiPath: String) : Boolean{
-        val path = File(appDirectory, title)
+    suspend fun addScore(score: Score, midiBytes: ByteArray) : Boolean{
+        val path = File(appDirectory, score.title)
 
         //Create the directory
         val dirCreated = path.mkdir()
 
         return if(dirCreated){
-            var i = 1
-            //Copy images
-            for (image in images){
-                //TODO check for possible errors
-                val imageFile = File(image)
-                val newFileName = "$i.${imageFile.extension}"
-                imageFile.copyTo(File(path,newFileName))
-                i++
+            score.sheets.forEachIndexed { index, sheetMusic ->
+                val imageFile = sheetMusic.imageFile
+                val newFileName = "$index.${imageFile.extension}"
+                Files.move(imageFile.toPath(), File(path,newFileName).toPath())
             }
+            //Write midi
+            val midiFile = File(path,"audio.mid")
+            midiFile.writeBytes(midiBytes)
 
-            //Copy midi
-            val midiFile = File(midiPath)
-            midiFile.copyTo(File(path,"audio.${midiFile.extension}"))
-
-            Toast.makeText(context, "$title added", Toast.LENGTH_SHORT).show()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "${score.title} added", Toast.LENGTH_SHORT).show()
+            }
             true
         }else{
-            Toast.makeText(context,  "Insertion failed", Toast.LENGTH_SHORT).show()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Insertion failed", Toast.LENGTH_SHORT).show()
+            }
             false
         }
     }

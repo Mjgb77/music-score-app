@@ -3,4 +3,11 @@
     <string name="add_score">Add Score</string>
     <string name="score_details">Score Details</string>
     <string name="action_settings">Settings</string>
+    <string name="score_title">Score Title</string>
+    <string name="add_image">Add image</string>
+    <string name="tempo">Tempo</string>
+    <string name="instrument">Instrument</string>
+    <string name="sheet">sheet</string>
+    <string name="delete">delete</string>
+    <string name="create">Create</string>
 </resources>
