@@ -10,4 +10,10 @@
     <string name="sheet">sheet</string>
     <string name="delete">delete</string>
     <string name="create">Create</string>
+    <string name="more">more</string>
+    <string name="play">play</string>
+    <string name="date">date</string>
+    <string name="date_created">Date created</string>
+    <string name="view_images">View images</string>
+    <string name="play_midi">Play MIDI</string>
 </resources>

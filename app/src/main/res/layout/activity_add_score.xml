@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewmodel"
-            type="com.example.musicscoreapp.AddScoreViewModel"/>
+            type="com.evmg.musicscoreapp.viewmodels.AddScoreViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +15,7 @@
         android:clipChildren="true"
         android:clipToPadding="false"
         android:padding="30dp"
-        tools:context=".AddScoreActivity">
+        tools:context=".activities.CreateOrUpdateScoreActivity">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textScoreTitle"
@@ -89,7 +89,8 @@
                     android:layout_weight="1"
                     android:completionThreshold="100"
                     android:hint="@string/instrument"
-                    android:inputType="none" />
+                    android:inputType="none"
+                    android:text="@={viewmodel.instrumentName}"/>
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
