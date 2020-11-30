@@ -34,10 +34,10 @@ object DetectionClusterInstances {
             staffDetectionService.initializeCPU(context)
             figureDetectionService.initializeCPU(context)
 
-            try {
-                staffDetectionService.initializeGPU(context)
-                figureDetectionService.initializeGPU(context)
-            } catch(e: Exception) {}
+//            try {
+//                staffDetectionService.initializeGPU(context)
+//                figureDetectionService.initializeGPU(context)
+//            } catch(e: Exception) {}
         }
     }
 }

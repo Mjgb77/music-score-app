@@ -1,7 +1,6 @@
 package com.evmg.musicscoreapp.service
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.widget.Toast
 import com.evmg.musicscoreapp.model.Score
 import com.evmg.musicscoreapp.objectparsing.SheetMusic
@@ -9,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.*
+import java.lang.Exception
 import java.nio.file.Files
 import java.nio.file.Path
 import java.text.SimpleDateFormat
@@ -35,6 +35,8 @@ class ScoreDb(private val context: Context) {
     suspend fun saveScore(score: Score, midiBytes: ByteArray) : Boolean {
         return withContext(Dispatchers.IO) {
             val directory = File(score.dir)
+            directory.deleteRecursively()
+            directory.mkdir()
 
             score.sheets?.forEachIndexed { index, sheetMusic ->
                 val imageFile = sheetMusic.imageFile
@@ -80,13 +82,13 @@ class ScoreDb(private val context: Context) {
         }
     }
 
-    fun generatePermanetDirectory(): Path {
+    fun generatePermanentDirectory(): Path {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         return Files.createDirectory(appDirectory.invoke()!!.toPath().resolve("score_$timeStamp"))
     }
 
     fun moveScoreToPermanent(score: Score) {
-        File(score.dir).copyRecursively(generatePermanetDirectory().toFile(), true)
+        File(score.dir).copyRecursively(generatePermanentDirectory().toFile(), true)
         File(score.dir).deleteRecursively()
         notifyListeners()
     }
@@ -97,18 +99,19 @@ class ScoreDb(private val context: Context) {
         val result = ArrayList<Score>()
 
         files.filter { File(it, "meta.json").exists() }.forEach { file ->
-            val metadataFile = JSONObject(FileReader(File(file, "meta.json")).readText())
-
-            result.add(
-                Score( // summary
-                    dir = file.absolutePath,
-                    title = metadataFile["title"] as String,
-                    tempo = metadataFile["tempo"] as Int,
-                    instrument = metadataFile["instrument"] as Int,
-                    sheets = null,
-                    createDate = Date(metadataFile["createDate"] as Long).time
+            try {
+                val metadataFile = JSONObject(FileReader(File(file, "meta.json")).readText())
+                result.add(
+                    Score( // summary
+                        dir = file.absolutePath,
+                        title = metadataFile["title"] as String,
+                        tempo = metadataFile["tempo"] as Int,
+                        instrument = metadataFile["instrument"] as Int,
+                        sheets = getSheets(file),
+                        createDate = Date(metadataFile["createDate"] as Long).time
+                    )
                 )
-            )
+            } catch (_: Exception) {}
         }
 
         return result

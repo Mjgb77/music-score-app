@@ -1,15 +1,11 @@
 package com.evmg.musicscoreapp.viewmodels
 
 import android.app.Application
-import android.os.Environment
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import com.evmg.musicscoreapp.service.ScoreToMidiConverter
 import com.evmg.musicscoreapp.model.Score
 import com.evmg.musicscoreapp.objectparsing.SheetMusic
-import com.evmg.musicscoreapp.service.PictureService
 import com.evmg.musicscoreapp.service.ScoreDb
-import kotlinx.coroutines.launch
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Files.createTempDirectory
@@ -19,7 +15,7 @@ import java.util.*
 class AddScoreViewModel(application: Application) : AndroidViewModel(application) {
     val scoreDb = ScoreDb(application)
     val draftDir = createTempDirectory(application.getExternalFilesDir("Temp")!!.toPath(), "score_")
-    var destDir = scoreDb.generatePermanetDirectory()
+    var destDir = scoreDb.generatePermanentDirectory()
     var title: String = ""
     var tempo: Int = 0
     var instrument: Int = 0
@@ -61,7 +57,7 @@ class AddScoreViewModel(application: Application) : AndroidViewModel(application
         instrument = score.instrument
         addAndProcessSheet(*(score.sheets ?: listOf())
             .map {
-                Files.move(it.imageFile.toPath(), destDir.resolve(it.imageFile.name)).toFile()
+                Files.move(it.imageFile.toPath(), draftDir.resolve(it.imageFile.name)).toFile()
             }
             .toTypedArray())
     }

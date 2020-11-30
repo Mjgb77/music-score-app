@@ -4,9 +4,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider
 import com.evmg.musicscoreapp.R
 import com.evmg.musicscoreapp.model.Score
 import com.evmg.musicscoreapp.service.ScoreDb
+import com.evmg.musicscoreapp.utils.IntentUtils
 import com.evmg.musicscoreapp.viewmodels.AddScoreViewModel
 import java.io.File
 import java.text.DateFormat
@@ -102,15 +103,34 @@ class ScoreDetailsActivity : AppCompatActivity() {
             confirmDialog()
         }
         if (item.itemId == R.id.edit_score) {
-            val intent = Intent(this, CreateOrUpdateScoreActivity::class.java)
-            intent.putExtra(CreateOrUpdateScoreActivity.SCORE_PATH, score.dir)
-            startActivity(intent)
+            val editIntent = Intent(this, CreateOrUpdateScoreActivity::class.java)
+            editIntent.putExtra(CreateOrUpdateScoreActivity.SCORE_PATH, score.dir)
+            startActivity(editIntent)
             finish()
         }
         if (item.itemId == R.id.import_score) {
             scoreDb.moveScoreToPermanent(score)
             finish()
         }
+        if (item.itemId == R.id.export_score) {
+            IntentUtils.shareScoreMedia(this, score) { f: File -> listOf("export.dscore").contains(f.name) }
+        }
+
+        if (item.itemId == R.id.share_score) {
+
+            val dialogBuilder = AlertDialog.Builder(this)
+            dialogBuilder.setTitle("Share ${score.title}?")
+            dialogBuilder.setMessage("Specify what you want to share for ${score.title}?")
+            dialogBuilder.setPositiveButton("Midi Only") { _, _ ->
+                IntentUtils.shareScoreMedia(this, score) { f: File -> listOf("mid").contains(f.extension) }
+            }
+            dialogBuilder.setNegativeButton("Midi and Images") { _, _ ->
+                IntentUtils.shareScoreMedia(this, score) { f: File -> listOf("mid", "jpg").contains(f.extension) }
+            }
+            dialogBuilder.setNeutralButton("Cancel") { _, _ -> }
+            dialogBuilder.create().show()
+        }
+
         return super.onOptionsItemSelected(item)
     }
 
