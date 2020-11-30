@@ -40,7 +40,8 @@ class MusicScoreAdapter internal constructor(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val score = musicScores[position]
-        holder.textTitle.text = "${score.title} (${score.sheets!!.size} pages}"
+        val txt = "${score.title} (${score.sheets!!.size} page${if(score.sheets.size == 1) "" else "s"})"
+        holder.textTitle.text = txt
         holder.textInstrument.text = AddScoreViewModel.INSTRUMENTS_BY_ID[score.instrument] ?: score.instrument.toString()
         holder.textDate.text = DateFormat.getDateInstance().format(Date(score.createDate))
 
@@ -52,6 +53,7 @@ class MusicScoreAdapter internal constructor(
         }
 
         val btnMenu = holder.itemView.findViewById<ImageButton>(R.id.btnActions)
+
         btnMenu.setOnClickListener { _ ->
             showPopupMenu(btnMenu, position)
         }

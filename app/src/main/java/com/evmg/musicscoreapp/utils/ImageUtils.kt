@@ -104,13 +104,13 @@ object ImageUtils {
     fun paintRect(img: Bitmap, rect: RectF, color: Int, strokeWidth: Int = 1) {
         val location = snap(rect)
         for (x in location.left until location.right) {
-            for (dy in 0..strokeWidth) {
+            for (dy in 0..min(strokeWidth, location.height())) {
                 img.set(x, location.top+dy, color)
                 img.set(x, location.bottom-dy, color)
             }
         }
         for (y in location.top until location.bottom) {
-            for (dx in 0..strokeWidth) {
+            for (dx in 0..min(strokeWidth, location.width())) {
                 img.set(location.left+dx, y, color)
                 img.set(location.right-dx, y, color)
             }
