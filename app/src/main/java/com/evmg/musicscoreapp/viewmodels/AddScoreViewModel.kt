@@ -8,6 +8,7 @@ import com.evmg.musicscoreapp.service.ScoreToMidiConverter
 import com.evmg.musicscoreapp.model.Score
 import com.evmg.musicscoreapp.objectparsing.SheetMusic
 import com.evmg.musicscoreapp.service.PictureService
+import com.evmg.musicscoreapp.service.ScoreDb
 import kotlinx.coroutines.launch
 import java.io.File
 import java.nio.file.Files
@@ -16,8 +17,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class AddScoreViewModel(application: Application) : AndroidViewModel(application) {
+    val scoreDb = ScoreDb(application)
     val draftDir = createTempDirectory(application.getExternalFilesDir("Temp")!!.toPath(), "score_")
-    var destDir = createTempDirectory(application.getExternalFilesDir("Scores")!!.toPath(), "score_")
+    var destDir = scoreDb.generatePermanetDirectory()
     var title: String = ""
     var tempo: Int = 0
     var instrument: Int = 0
@@ -51,7 +53,9 @@ class AddScoreViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun setOriginalScore(score: Score) {
-        destDir = File(score.dir).toPath()
+        destDir.toFile().deleteRecursively()
+        destDir = File(score.dir)
+            .toPath()
         title = score.title
         tempo = score.tempo
         instrument = score.instrument
@@ -75,7 +79,8 @@ class AddScoreViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun getInstrumentName(): String {
-        return INSTRUMENTS_BY_ID[instrument] ?: error("InstrumentName not found for $instrument")
+        return INSTRUMENTS_BY_ID[instrument] ?: ""
+//        return INSTRUMENTS_BY_ID[instrument] ?: error("InstrumentName not found for $instrument")
     }
 
     fun createScore() {
@@ -95,7 +100,8 @@ class AddScoreViewModel(application: Application) : AndroidViewModel(application
 
     fun getNewImageFile(): File {
         // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         return File(
             draftDir.toFile(),
             "JPEG_${timeStamp}.jpg"

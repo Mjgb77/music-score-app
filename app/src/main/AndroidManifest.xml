@@ -21,17 +21,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicScoreApp">
+        <activity android:name=".activities.ViewPicturesActivity"></activity>
         <activity
-            android:name="com.evmg.musicscoreapp.activities.ScoreDetailsActivity"
+            android:name=".activities.ScoreDetailsActivity"
             android:label="@string/score_details"
             android:launchMode="singleTask"
-            android:parentActivityName="com.evmg.musicscoreapp.activities.CreateOrUpdateScoreActivity" />
+            android:parentActivityName=".activities.CreateOrUpdateScoreActivity" />
         <activity
-            android:name="com.evmg.musicscoreapp.activities.CreateOrUpdateScoreActivity"
+            android:name=".activities.CreateOrUpdateScoreActivity"
             android:label="@string/add_score"
             android:launchMode="singleTask"
-            android:parentActivityName="com.evmg.musicscoreapp.activities.MainActivity" />
-        <activity android:name="com.evmg.musicscoreapp.activities.ImportActivity"
+            android:parentActivityName=".activities.MainActivity" />
+        <activity
+            android:name=".activities.ImportActivity"
             android:label="@string/add_score"
             android:launchMode="singleTask">
 
@@ -43,15 +45,13 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="content" />
-
                 <data android:pathPattern=".*\.dscore" />
-
                 <data android:mimeType="application/octet-stream" />
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.evmg.musicscoreapp.activities.MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.MusicScoreApp.NoActionBar">
             <intent-filter>

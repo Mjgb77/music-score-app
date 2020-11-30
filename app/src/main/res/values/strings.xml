@@ -8,7 +8,7 @@
     <string name="tempo">Tempo</string>
     <string name="instrument">Instrument</string>
     <string name="sheet">sheet</string>
-    <string name="delete">delete</string>
+    <string name="delete">Delete</string>
     <string name="create">Create</string>
     <string name="more">more</string>
     <string name="play">play</string>
@@ -16,4 +16,10 @@
     <string name="date_created">Date created</string>
     <string name="view_images">View images</string>
     <string name="play_midi">Play MIDI</string>
+    <string name="loading_your_score">Loading your score</string>
+    <string name="save">Save</string>
+    <string name="export">Export</string>
+    <string name="share">Share</string>
+    <string name="view">View</string>
+    <string name="edit">Edit</string>
 </resources>

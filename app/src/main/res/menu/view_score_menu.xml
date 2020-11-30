@@ -3,23 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:title="Share"
         android:id="@+id/share_score"
+        android:title="@string/share"
         app:showAsAction="never" />
 
     <item
-        android:title="Export"
         android:id="@+id/export_score"
+        android:title="@string/export"
         app:showAsAction="never" />
 
     <item
-        android:title="Edit"
         android:id="@+id/edit_score"
+        android:icon="@drawable/ic_baseline_edit_24"
+        android:title="@string/edit"
         app:showAsAction="ifRoom" />
 
     <item
-        android:title="Delete"
         android:id="@+id/delete_score"
         android:icon="@drawable/ic_delete"
+        android:title="@string/delete"
         app:showAsAction="always" />
 </menu>

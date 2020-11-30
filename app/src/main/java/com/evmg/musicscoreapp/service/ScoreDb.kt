@@ -10,6 +10,8 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.*
 import java.nio.file.Files
+import java.nio.file.Path
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -78,9 +80,15 @@ class ScoreDb(private val context: Context) {
         }
     }
 
-    fun moveScore(score: Score, dest: File) {
-        if (dest.exists()) dest.deleteRecursively()
-        Files.move(File(score.dir).toPath(), dest.toPath())
+    fun generatePermanetDirectory(): Path {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        return Files.createDirectory(appDirectory.invoke()!!.toPath().resolve("score_$timeStamp"))
+    }
+
+    fun moveScoreToPermanent(score: Score) {
+        File(score.dir).copyRecursively(generatePermanetDirectory().toFile(), true)
+        File(score.dir).deleteRecursively()
+        notifyListeners()
     }
 
     fun getAllScores(): ArrayList<Score> {

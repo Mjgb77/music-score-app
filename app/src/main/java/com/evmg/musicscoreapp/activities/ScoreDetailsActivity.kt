@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -23,6 +24,8 @@ import java.util.*
 class ScoreDetailsActivity : AppCompatActivity() {
     companion object {
         val SCORE_PATH = "scorePath"
+        val TYPE = "type"
+        val TYPE_IMPORT = "import"
     }
 
     private val scoreDb = ScoreDb(this)
@@ -69,22 +72,28 @@ class ScoreDetailsActivity : AppCompatActivity() {
         }
 
         btnViewImages.setOnClickListener {
-            val intent = Intent()
-            intent.action = Intent.ACTION_VIEW
-            val uri = FileProvider.getUriForFile(
-                this,
-                "com.evmg.musicscoreapp.fileprovider",
-                File(score.dir))
-            intent.setDataAndType(uri, "*/*")
-                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(Intent.createChooser(intent, "Open images"))
+            val intentViewPicsActivity = Intent(this, ViewPicturesActivity::class.java)
+            intentViewPicsActivity.putExtra(ViewPicturesActivity.SCORE_DIR, score.dir)
+            startActivity(intentViewPicsActivity)
+//            intent.action = Intent.ACTION_VIEW
+//            val uri = FileProvider.getUriForFile(
+//                this,
+//                "com.evmg.musicscoreapp.fileprovider",
+//                File(score.dir))
+//            intent.setDataAndType(uri, "*/*")
+//                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+//                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            startActivity(Intent.createChooser(intent, "Open images"))
         }
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.view_score_menu, menu)
+        if (isImport()) {
+            menuInflater.inflate(R.menu.import_score_menu, menu)
+        } else {
+            menuInflater.inflate(R.menu.view_score_menu, menu)
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -96,6 +105,10 @@ class ScoreDetailsActivity : AppCompatActivity() {
             val intent = Intent(this, CreateOrUpdateScoreActivity::class.java)
             intent.putExtra(CreateOrUpdateScoreActivity.SCORE_PATH, score.dir)
             startActivity(intent)
+            finish()
+        }
+        if (item.itemId == R.id.import_score) {
+            scoreDb.moveScoreToPermanent(score)
             finish()
         }
         return super.onOptionsItemSelected(item)
@@ -118,5 +131,9 @@ class ScoreDetailsActivity : AppCompatActivity() {
             return scoreDb.getScore(intent.getStringExtra(SCORE_PATH)!!)
         }
         return null
+    }
+
+    private fun isImport(): Boolean {
+        return intent.hasExtra(TYPE) && intent.getStringExtra(TYPE) == TYPE_IMPORT
     }
 }

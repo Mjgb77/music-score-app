@@ -131,7 +131,7 @@ class PictureService(private val context: Activity) : ViewModel() {
 
     private fun createImageFile(): File {
         // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
 
         return File(
             context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),

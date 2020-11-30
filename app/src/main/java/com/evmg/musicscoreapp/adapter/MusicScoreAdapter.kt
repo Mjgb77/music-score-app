@@ -15,8 +15,10 @@ import com.evmg.musicscoreapp.R
 import com.evmg.musicscoreapp.activities.ScoreDetailsActivity
 import com.evmg.musicscoreapp.adapter.MusicScoreAdapter.MyViewHolder
 import com.evmg.musicscoreapp.model.Score
+import com.evmg.musicscoreapp.viewmodels.AddScoreViewModel
 import java.io.File
-
+import java.text.DateFormat
+import java.util.*
 
 class MusicScoreAdapter internal constructor(
     private val context: Context,
@@ -32,12 +34,15 @@ class MusicScoreAdapter internal constructor(
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val musicScore = musicScores[position]
-        holder.txtTitle.text = musicScore.title
+        val score = musicScores[position]
+        holder.textTitle.text = score.title
+        holder.textInstrument.text = AddScoreViewModel.INSTRUMENTS_BY_ID[score.instrument] ?: score.instrument.toString()
+        holder.textDate.text = DateFormat.getDateInstance().format(Date(score.createDate))
+
 
         holder.mainLayout.setOnClickListener { _->
             val intent = Intent(context, ScoreDetailsActivity::class.java)
-            intent.putExtra(ScoreDetailsActivity.SCORE_PATH, musicScore.dir)
+            intent.putExtra(ScoreDetailsActivity.SCORE_PATH, score.dir)
             activity.startActivityForResult(intent, 1)
         }
 
@@ -47,7 +52,7 @@ class MusicScoreAdapter internal constructor(
         }
 
         val btnPlay = holder.itemView.findViewById<ImageButton>(R.id.btnPlayScore)
-        val scoreFolder = File(musicScore.dir)
+        val scoreFolder = File(score.dir)
 
         btnPlay.setOnClickListener { _ ->
             val intent = Intent()
@@ -67,7 +72,9 @@ class MusicScoreAdapter internal constructor(
     }
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val txtTitle: TextView = itemView.findViewById(R.id.textTitle)
+        internal val textTitle: TextView = itemView.findViewById(R.id.textTitle)
+        internal val textInstrument: TextView = itemView.findViewById(R.id.textInstrument)
+        internal val textDate: TextView = itemView.findViewById(R.id.textDate)
         internal val mainLayout: ConstraintLayout = itemView.findViewById(R.id.mainLayout)
     }
 
