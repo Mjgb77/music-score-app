@@ -14,13 +14,11 @@ import com.evmg.musicscoreapp.viewmodels.AddScoreViewModel
 import com.evmg.musicscoreapp.R
 import com.evmg.musicscoreapp.adapter.NoFilterArrayAdapter
 import com.evmg.musicscoreapp.adapter.SheetAdapter
-import com.evmg.musicscoreapp.databinding.ActivityAddScoreBinding
+import com.evmg.musicscoreapp.databinding.ActivityCreateOrUpdateScoreBinding
 import com.evmg.musicscoreapp.model.Score
 import com.evmg.musicscoreapp.service.PictureService
 import com.evmg.musicscoreapp.service.ScoreDb
 import kotlinx.coroutines.launch
-import java.io.File
-import kotlin.random.Random
 
 
 class CreateOrUpdateScoreActivity : AppCompatActivity() {
@@ -37,13 +35,13 @@ class CreateOrUpdateScoreActivity : AppCompatActivity() {
     //cancion a -> view -> edit (tempCancionA) -> view cancionA <- tempCancionA
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_score)
+        setContentView(R.layout.activity_create_or_update_score)
         scoreDb = ScoreDb(this)
 
         val scoreModel: AddScoreViewModel by viewModels()
-        val binding: ActivityAddScoreBinding = DataBindingUtil.setContentView(
+        val binding: ActivityCreateOrUpdateScoreBinding = DataBindingUtil.setContentView(
             this,
-            R.layout.activity_add_score
+            R.layout.activity_create_or_update_score
         )
         binding.viewmodel = scoreModel
 

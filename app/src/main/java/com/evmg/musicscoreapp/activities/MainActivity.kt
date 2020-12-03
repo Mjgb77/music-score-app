@@ -3,10 +3,13 @@ package com.evmg.musicscoreapp.activities
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,6 +20,7 @@ import com.evmg.musicscoreapp.adapter.MusicScoreAdapter
 import com.evmg.musicscoreapp.model.Score
 import com.evmg.musicscoreapp.service.DetectionClusterInstances
 import com.evmg.musicscoreapp.service.ScoreDb
+import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
@@ -25,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var scoreDb: ScoreDb
     lateinit var musicScoreAdapter: MusicScoreAdapter
     var filterString: String = ""
+    var sorter: (List<Score>) -> List<Score> = { it }
     val visibleScores = arrayListOf<Score>()
     val allScores = arrayListOf<Score>()
 
@@ -34,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         DetectionClusterInstances.init(applicationContext)
 
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { _ ->
             val intent = Intent(this, CreateOrUpdateScoreActivity::class.java)
             startActivity(intent)
@@ -88,6 +92,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        val showSortBy = menu.findItem(R.id.sort_bar)
+        showSortBy?.setOnMenuItemClickListener{
+            val layoutChips = findViewById<LinearLayout>(R.id.layout_chips)
+            layoutChips.visibility = if (layoutChips.visibility == ViewGroup.GONE) ViewGroup.VISIBLE else ViewGroup.GONE
+            true
+        }
+
         return true
     }
 
@@ -110,7 +121,7 @@ class MainActivity : AppCompatActivity() {
 
     fun applyFilterAndSetSongs() {
         visibleScores.clear()
-        visibleScores.addAll(allScores.filter {
+        visibleScores.addAll(sorter(allScores).filter {
             it.title.toLowerCase(Locale.US).contains(filterString.toLowerCase(Locale.US))
         })
     }
@@ -118,5 +129,24 @@ class MainActivity : AppCompatActivity() {
     fun refetchScores() {
         allScores.clear()
         allScores.addAll(scoreDb.getAllScores())
+    }
+
+    fun chipClicked(view: View) {
+        if (view is Chip) {
+            if (!view.isSelected) {
+                for (other in listOf(R.id.chip_sort_date, R.id.chip_sort_name).filter { view.id != it }) {
+                    findViewById<Chip>(other).isSelected = false
+                }
+                view.isSelected = true
+                when(view.id) {
+                    R.id.chip_sort_date -> {
+                        sorter = { it.sortedBy { -it.createDate }}
+                    }
+                    R.id.chip_sort_name -> {
+                        sorter = { it.sortedBy { it.title }}
+                    }
+                }
+            }
+        }
     }
 }

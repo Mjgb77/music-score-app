@@ -1,18 +1,21 @@
 package com.evmg.musicscoreapp.service
 
+import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.*
 import android.util.Log
 import com.evmg.musicscoreapp.model.Recognition
+import com.evmg.musicscoreapp.model.Score
 import com.evmg.musicscoreapp.model.StaffRecognition
 import com.evmg.musicscoreapp.objectparsing.StaffToMidi
 import com.evmg.musicscoreapp.utils.ImageUtils
-import com.evmg.musicscoreapp.model.Score
 import kotlinx.coroutines.*
+import java.io.BufferedOutputStream
 import java.io.File
-import java.lang.Exception
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.concurrent.ArrayBlockingQueue
-import kotlin.collections.ArrayList
+
 
 object ScoreToMidiConverter {
     lateinit var scope: CoroutineScope
@@ -21,7 +24,7 @@ object ScoreToMidiConverter {
     private val processingSheets = hashMapOf<Int, Deferred<ArrayList<StaffRecognition>>>()
     private val processor = ArrayBlockingQueue<Deferred<ArrayList<StaffRecognition>>>(100)
 
-    private val COLORS = arrayOf (
+    private val COLORS = arrayOf(
         Color.parseColor("#3d3df5"),
         Color.parseColor("#b25050"),
         Color.parseColor("#3df53d"),
@@ -85,11 +88,22 @@ object ScoreToMidiConverter {
             Log.d("MY-DEB", "$PREFIX width:${image.width} height:${image.height} -> ended")
             val mutable = image.copy(image.config, true)
             for (a in recognitions) {
-                ImageUtils.paintRect(mutable, a.staff.location, Color.DKGRAY, 20)
+                ImageUtils.paintRect(mutable, a.staff.location, Color.DKGRAY, 5)
                 for(b in a.objects) {
-                    ImageUtils.paintRect(mutable, b.location, COLORS[b.detectedClass%COLORS.size], 10)
+                    ImageUtils.paintRect(
+                        mutable,
+                        b.location,
+                        COLORS[b.detectedClass % COLORS.size],
+                        3
+                    )
                 }
             }
+
+            val predictions = File(context.getExternalFilesDir("Scores"), "predicitions.jpg")
+            predictions.createNewFile()
+            val os: OutputStream = BufferedOutputStream(FileOutputStream(predictions))
+            mutable.compress(Bitmap.CompressFormat.JPEG, 100, os)
+            os.close()
 
             recognitions
         }

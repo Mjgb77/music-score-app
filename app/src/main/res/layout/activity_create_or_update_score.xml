@@ -137,7 +137,7 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:contentDescription="@string/create"
-            android:text="@string/create"
+            android:text="@string/save"
             app:icon="@drawable/ic_baseline_add_task_24"
             app:iconGravity="end"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -24,4 +24,5 @@
     <string name="edit">Edit</string>
     <string name="search">search</string>
     <string name="sort">sort</string>
+    <string name="date_recent_first">Date (recent first)</string>
 </resources>
