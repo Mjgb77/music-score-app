@@ -22,8 +22,10 @@ import com.evmg.musicscoreapp.service.DetectionClusterInstances
 import com.evmg.musicscoreapp.service.ScoreDb
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -36,8 +38,8 @@ class MainActivity : AppCompatActivity() {
     var sortCriteria = Criteria.DATE
     var sortOrder = Order.DESC
     enum class Criteria(val chipId: Int, val processor: (List<Score>) -> List<Score>) {
-        TITLE(R.id.chip_sort_title, { it.sortedBy { it.createDate } }),
-        DATE(R.id.chip_sort_date, { it.sortedBy { it.title.toLowerCase(Locale.US) }}),
+        TITLE(R.id.chip_sort_title, { it.sortedBy { it.title.toLowerCase(Locale.US) }}),
+        DATE(R.id.chip_sort_date, { it.sortedBy { it.createDate } }),
         PAGES(R.id.chip_sort_title, { it.sortedBy { it.sheets?.size } })
     }
     enum class Order(val chipId: Int, val processor: (List<Score>) -> List<Score>) {
@@ -144,10 +146,12 @@ class MainActivity : AppCompatActivity() {
         for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
         findViewById<Chip>(sortCriteria.chipId).isSelected = true
         findViewById<Chip>(sortOrder.chipId).isSelected = true
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             delay(100)
-            layoutSortOrderChips.visibility = ViewGroup.GONE
-            layoutSort.visibility = ViewGroup.GONE
+            withContext(Dispatchers.Main) {
+                layoutSortOrderChips.visibility = ViewGroup.GONE
+                layoutSort.visibility = ViewGroup.GONE
+            }
         }
     }
     fun applySort(scores: List<Score>): List<Score> {
@@ -167,44 +171,42 @@ class MainActivity : AppCompatActivity() {
 
     val criteriaChips = listOf(R.id.chip_sort_date, R.id.chip_sort_title)
     val orderChips = listOf(R.id.chip_sort_asc, R.id.chip_sort_desc)
-    var temp = Criteria.TITLE
+    var temp = Criteria.DATE
     fun chipClicked(view: View) {
         if (view is Chip) {
-            if (!view.isSelected) {
-                if (criteriaChips.contains(view.id)) {
-                    for (other in criteriaChips.filter { view.id != it }) {
-                        findViewById<Chip>(other).isSelected = false
-                    }
+            if (criteriaChips.contains(view.id)) {
+                for (other in criteriaChips.filter { view.id != it }) {
+                    findViewById<Chip>(other).isSelected = false
                 }
-                when(view.id) {
-                    R.id.chip_sort_date -> {
-                        view.isSelected = true
-                        for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
-                        layoutSortOrderChips.visibility = ViewGroup.VISIBLE
-                        temp = Criteria.DATE
-                    }
-                    R.id.chip_sort_title -> {
-                        view.isSelected = true
-                        for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
-                        layoutSortOrderChips.visibility = ViewGroup.VISIBLE
-                        temp = Criteria.DATE
-                    }
-                    R.id.chip_sort_asc -> {
-                        view.isSelected = true
-                        sortCriteria = temp
-                        sortOrder = Order.ASC
-                        showSort()
-                        applyFilterAndSetSongs()
-                        musicScoreAdapter.notifyDataSetChanged()
-                    }
-                    R.id.chip_sort_desc -> {
-                        view.isSelected = true
-                        sortCriteria = temp
-                        sortOrder = Order.ASC
-                        showSort()
-                        applyFilterAndSetSongs()
-                        musicScoreAdapter.notifyDataSetChanged()
-                    }
+            }
+            when(view.id) {
+                R.id.chip_sort_date -> {
+                    view.isSelected = true
+                    for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
+                    layoutSortOrderChips.visibility = ViewGroup.VISIBLE
+                    temp = Criteria.DATE
+                }
+                R.id.chip_sort_title -> {
+                    view.isSelected = true
+                    for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
+                    layoutSortOrderChips.visibility = ViewGroup.VISIBLE
+                    temp = Criteria.TITLE
+                }
+                R.id.chip_sort_asc -> {
+                    view.isSelected = true
+                    sortCriteria = temp
+                    sortOrder = Order.ASC
+                    showSort()
+                    applyFilterAndSetSongs()
+                    musicScoreAdapter.notifyDataSetChanged()
+                }
+                R.id.chip_sort_desc -> {
+                    view.isSelected = true
+                    sortCriteria = temp
+                    sortOrder = Order.DESC
+                    showSort()
+                    applyFilterAndSetSongs()
+                    musicScoreAdapter.notifyDataSetChanged()
                 }
             }
         }
