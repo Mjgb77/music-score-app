@@ -6,8 +6,33 @@ import androidx.core.graphics.get
 import com.evmg.musicscoreapp.model.Recognition
 import com.evmg.musicscoreapp.utils.ImageUtils
 import kotlin.math.round
+import kotlin.math.sqrt
 
 object ObjectAdjustments {
+
+    fun adjustStaff(recognition: Recognition, bitmap: Bitmap): Recognition {
+        val snapped = ImageUtils.snap(recognition.location)
+        var newLeft = snapped.left
+        var newRight = snapped.right
+        while (newLeft > 0 &&
+            verticalDeviation(newLeft - 1, snapped.top..snapped.bottom, bitmap) > 20.0) {
+            newLeft--
+        }
+        while (newRight+1 < bitmap.width &&
+            verticalDeviation(newRight + 1, snapped.top..snapped.bottom, bitmap) > 20.0) {
+            newRight++
+        }
+        return Recognition(
+            recognition.id,
+            recognition.title,
+            recognition.confidence,
+            RectF(
+                newLeft.toFloat(),
+                recognition.location.top,
+                newRight.toFloat(),
+                recognition.location.bottom),
+            recognition.detectedClass)
+    }
 
     fun adjustBarline(recognition: Recognition, bitmap: Bitmap): Recognition {
         return adjustBarlineWithParams(
@@ -51,6 +76,13 @@ object ObjectAdjustments {
                         recognition.location.right,
                         dDown.toFloat()),
                 recognition.detectedClass)
+    }
+
+    private fun verticalDeviation(x: Int, yRange: IntRange, bmp: Bitmap): Double {
+        val pixels = yRange.map { grayScale(bmp.getPixel(x, it)).toFloat() }
+        val avg = pixels.average()
+        val dev = pixels.map { (it - avg) * (it - avg) }.sum() / yRange.count()
+        return sqrt(dev)
     }
 
     private fun grayScale(color: Int): Int {

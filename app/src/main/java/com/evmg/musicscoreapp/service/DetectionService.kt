@@ -448,6 +448,7 @@ open class DetectionService(
     fun postProcess(recognition: Recognition, bitmap: Bitmap): Recognition {
         return when (recognition.title) {
             "barline" -> ObjectAdjustments.adjustBarline(recognition, bitmap)
+            "Staff" -> ObjectAdjustments.adjustStaff(recognition, bitmap)
             else -> recognition
         }
     }

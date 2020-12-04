@@ -1,7 +1,9 @@
 package com.evmg.musicscoreapp.objectparsing
 
 import android.graphics.RectF
+import android.util.Log
 import kotlin.math.round
+import kotlin.math.max
 
 class PitchContext (var barlineRef: RectF) {
     private enum class ClefValues(val delta: Int) {
@@ -23,7 +25,11 @@ class PitchContext (var barlineRef: RectF) {
     }
 
     private fun getNote(pos: Int):Int {
-        return pos + clefVal.delta
+        val ret = pos + clefVal.delta
+        if (ret < 0) {
+            Log.w(PitchContext::class.java.simpleName, "Note below C1")
+        }
+        return max(ret, 0)
     }
 
     fun getPitch (mObject: RectF):Int {

@@ -3,7 +3,10 @@ package com.evmg.musicscoreapp.service
 import android.content.Context
 import android.widget.Toast
 import com.evmg.musicscoreapp.model.Score
+import com.evmg.musicscoreapp.model.StaffRecognition
+import com.evmg.musicscoreapp.model.StoredScore
 import com.evmg.musicscoreapp.objectparsing.SheetMusic
+import com.evmg.musicscoreapp.utils.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -32,8 +35,9 @@ class ScoreDb(private val context: Context) {
         listeners.remove(obj)
     }
 
-    suspend fun saveScore(score: Score, midiBytes: ByteArray) : Boolean {
+    suspend fun saveScore(score: Score, midiBytes: ByteArray, allStaffs: List<ArrayList<StaffRecognition>>) : Boolean {
         return withContext(Dispatchers.IO) {
+            val storedScore = StoredScore(score, allStaffs)
             val directory = File(score.dir)
             directory.deleteRecursively()
             directory.mkdir()
@@ -51,7 +55,7 @@ class ScoreDb(private val context: Context) {
             //Write metadata
             val metadataFile = File(directory, "meta.json")
             FileWriter(metadataFile).use {
-                it.write(score.getMetadataJson())
+                it.write(storedScore.getMetadataJson())
             }
 
 
@@ -131,12 +135,21 @@ class ScoreDb(private val context: Context) {
         )
     }
 
+    fun getFullScore(absolutePath: String): StoredScore? {
+        val file = File(absolutePath)
+        if (!file.exists()) return null
+        val metadataFile = JSONObject(FileReader(File(file, "meta.json")).readText())
+        return JsonParser.parseMetadata(file.absolutePath, getSheets(file), metadataFile)
+    }
+
     private fun getSheets(dir: File): List<SheetMusic> {
-        return dir.listFiles { f -> f.extension == "jpg" } .map {
-            SheetMusic(
-                it.nameWithoutExtension.toInt(),
-                it)
-        }
+        return dir.listFiles { f -> f.extension == "jpg" }
+            .sortedBy { f -> f.nameWithoutExtension.toInt() }
+            .map {
+                SheetMusic(
+                    it.nameWithoutExtension.toInt(),
+                    it)
+            }
     }
 
     fun deleteScore(dir: String) {

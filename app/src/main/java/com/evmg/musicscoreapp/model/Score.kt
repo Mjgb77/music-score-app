@@ -11,19 +11,7 @@ class Score(
     val instrument: Int,
     val sheets: List<SheetMusic>?,
     val createDate: Long = Date().time
-) {
-    public enum class Namespace { SAVED, TEMP }
-    fun getMetadataJson(): String{
-        return """
-            {
-                "title": "$title",
-                "tempo": $tempo,
-                "instrument": $instrument,
-                "createDate": $createDate
-            }
-        """.trimIndent()
-    }
-}
+)
 /*
 Interno_Temporal_scores
 -> [] 1, 2, 3, 4, 5

@@ -1,6 +1,5 @@
 package com.evmg.musicscoreapp.service
 
-import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.*
 import android.util.Log
@@ -24,7 +23,7 @@ object ScoreToMidiConverter {
     private val processingSheets = hashMapOf<Int, Deferred<ArrayList<StaffRecognition>>>()
     private val processor = ArrayBlockingQueue<Deferred<ArrayList<StaffRecognition>>>(100)
 
-    private val COLORS = arrayOf(
+    val COLORS = arrayOf(
         Color.parseColor("#3d3df5"),
         Color.parseColor("#b25050"),
         Color.parseColor("#3df53d"),
@@ -121,11 +120,12 @@ object ScoreToMidiConverter {
         scope.launch {
             try {
                 val deferredSheets = score.sheets.map { processingSheets[it.id]!! }
-                val allStaffs = deferredSheets.map { it.await() }.flatten()
+                val allStaffs = deferredSheets.map { it.await() }
+                val flattenedStaffs = allStaffs.flatten()
                 val midiBytes =
-                    StaffToMidi.staffToMidi(allStaffs, score.tempo, score.instrument.toByte())
-                val fileStorageHelper = ScoreDb(context)
-                fileStorageHelper.saveScore(score, midiBytes)
+                    StaffToMidi.staffToMidi(flattenedStaffs, score.tempo, score.instrument.toByte())
+                val scoreDb = ScoreDb(context)
+                scoreDb.saveScore(score, midiBytes, allStaffs)
             } catch (ex: Exception) {
                 Log.e(PREFIX, "Error creating staff", ex)
             }
