@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/include"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -23,7 +23,6 @@
             android:scrollbars="none">
 
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/partsChipGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -32,18 +31,52 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="chipClicked"
-                    android:text="@string/date_recent_first"
+                    android:text="@string/chip_sort_date"
+                    android:checked="true"
                     android:theme="@style/Theme.MaterialComponents"
                     app:chipBackgroundColor="@color/chip_style" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_sort_name"
+                    android:id="@+id/chip_sort_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="chipClicked"
                     android:theme="@style/Theme.MaterialComponents"
                     app:chipBackgroundColor="@color/chip_style"
-                    android:text="@string/date_recent_first" />
+                    android:text="@string/chip_sort_title" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:id="@+id/chipsForOrder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_sort_asc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="chipClicked"
+                    android:text="@string/chip_sort_ascending"
+                    android:theme="@style/Theme.MaterialComponents"
+                    app:chipBackgroundColor="@color/chip_style" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_sort_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="chipClicked"
+                    android:checked="true"
+                    android:theme="@style/Theme.MaterialComponents"
+                    app:chipBackgroundColor="@color/chip_style"
+                    android:text="@string/chip_sort_descending" />
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
     </LinearLayout>

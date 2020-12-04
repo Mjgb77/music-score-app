@@ -25,4 +25,8 @@
     <string name="search">search</string>
     <string name="sort">sort</string>
     <string name="date_recent_first">Date (recent first)</string>
+    <string name="chip_sort_ascending">Ascending</string>
+    <string name="chip_sort_descending">Descending</string>
+    <string name="chip_sort_title">Title</string>
+    <string name="chip_sort_date">Date</string>
 </resources>

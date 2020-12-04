@@ -3,7 +3,6 @@ package com.evmg.musicscoreapp.activities
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,14 +22,28 @@ import com.evmg.musicscoreapp.service.DetectionClusterInstances
 import com.evmg.musicscoreapp.service.ScoreDb
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var recyclerView: RecyclerView
     lateinit var scoreDb: ScoreDb
     lateinit var musicScoreAdapter: MusicScoreAdapter
+    lateinit var layoutSortOrderChips: ViewGroup
+    lateinit var layoutSort: LinearLayout
     var filterString: String = ""
-    var sorter: (List<Score>) -> List<Score> = { it }
+    var sortCriteria = Criteria.DATE
+    var sortOrder = Order.DESC
+    enum class Criteria(val chipId: Int, val processor: (List<Score>) -> List<Score>) {
+        TITLE(R.id.chip_sort_title, { it.sortedBy { it.createDate } }),
+        DATE(R.id.chip_sort_date, { it.sortedBy { it.title.toLowerCase(Locale.US) }}),
+        PAGES(R.id.chip_sort_title, { it.sortedBy { it.sheets?.size } })
+    }
+    enum class Order(val chipId: Int, val processor: (List<Score>) -> List<Score>) {
+        ASC(R.id.chip_sort_asc, { it }),
+        DESC(R.id.chip_sort_desc, { it.reversed() })
+    }
     val visibleScores = arrayListOf<Score>()
     val allScores = arrayListOf<Score>()
 
@@ -43,8 +57,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, CreateOrUpdateScoreActivity::class.java)
             startActivity(intent)
         }
-        recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        layoutSort = findViewById(R.id.layout_chips)
+        layoutSortOrderChips = findViewById(R.id.chipsForOrder)
+        recyclerView = findViewById(R.id.recyclerView)
+
         scoreDb = ScoreDb(this)
+        showSort()
         refetchScores()
         applyFilterAndSetSongs()
         musicScoreAdapter = MusicScoreAdapter(this, this, visibleScores)
@@ -94,8 +112,10 @@ class MainActivity : AppCompatActivity() {
 
         val showSortBy = menu.findItem(R.id.sort_bar)
         showSortBy?.setOnMenuItemClickListener{
-            val layoutChips = findViewById<LinearLayout>(R.id.layout_chips)
-            layoutChips.visibility = if (layoutChips.visibility == ViewGroup.GONE) ViewGroup.VISIBLE else ViewGroup.GONE
+            layoutSort.visibility = if (layoutSort.visibility == ViewGroup.GONE) ViewGroup.VISIBLE else ViewGroup.GONE
+            if (layoutSort.visibility == ViewGroup.GONE) {
+                showSort()
+            }
             true
         }
 
@@ -119,9 +139,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun showSort() {
+        for (c in Criteria.values()) findViewById<Chip>(c.chipId).isSelected = false
+        for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
+        findViewById<Chip>(sortCriteria.chipId).isSelected = true
+        findViewById<Chip>(sortOrder.chipId).isSelected = true
+        lifecycleScope.launch {
+            delay(100)
+            layoutSortOrderChips.visibility = ViewGroup.GONE
+            layoutSort.visibility = ViewGroup.GONE
+        }
+    }
+    fun applySort(scores: List<Score>): List<Score> {
+        return sortOrder.processor(sortCriteria.processor(scores))
+    }
     fun applyFilterAndSetSongs() {
         visibleScores.clear()
-        visibleScores.addAll(sorter(allScores).filter {
+        visibleScores.addAll(applySort(allScores).filter {
             it.title.toLowerCase(Locale.US).contains(filterString.toLowerCase(Locale.US))
         })
     }
@@ -131,19 +165,45 @@ class MainActivity : AppCompatActivity() {
         allScores.addAll(scoreDb.getAllScores())
     }
 
+    val criteriaChips = listOf(R.id.chip_sort_date, R.id.chip_sort_title)
+    val orderChips = listOf(R.id.chip_sort_asc, R.id.chip_sort_desc)
+    var temp = Criteria.TITLE
     fun chipClicked(view: View) {
         if (view is Chip) {
             if (!view.isSelected) {
-                for (other in listOf(R.id.chip_sort_date, R.id.chip_sort_name).filter { view.id != it }) {
-                    findViewById<Chip>(other).isSelected = false
+                if (criteriaChips.contains(view.id)) {
+                    for (other in criteriaChips.filter { view.id != it }) {
+                        findViewById<Chip>(other).isSelected = false
+                    }
                 }
-                view.isSelected = true
                 when(view.id) {
                     R.id.chip_sort_date -> {
-                        sorter = { it.sortedBy { -it.createDate }}
+                        view.isSelected = true
+                        for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
+                        layoutSortOrderChips.visibility = ViewGroup.VISIBLE
+                        temp = Criteria.DATE
                     }
-                    R.id.chip_sort_name -> {
-                        sorter = { it.sortedBy { it.title }}
+                    R.id.chip_sort_title -> {
+                        view.isSelected = true
+                        for (c in Order.values()) findViewById<Chip>(c.chipId).isSelected = false
+                        layoutSortOrderChips.visibility = ViewGroup.VISIBLE
+                        temp = Criteria.DATE
+                    }
+                    R.id.chip_sort_asc -> {
+                        view.isSelected = true
+                        sortCriteria = temp
+                        sortOrder = Order.ASC
+                        showSort()
+                        applyFilterAndSetSongs()
+                        musicScoreAdapter.notifyDataSetChanged()
+                    }
+                    R.id.chip_sort_desc -> {
+                        view.isSelected = true
+                        sortCriteria = temp
+                        sortOrder = Order.ASC
+                        showSort()
+                        applyFilterAndSetSongs()
+                        musicScoreAdapter.notifyDataSetChanged()
                     }
                 }
             }
