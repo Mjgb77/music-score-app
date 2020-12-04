@@ -30,8 +30,8 @@ object StaffToMidi {
                 a.left - b.right
             } else
                 max(a.left, b.left) - min(a.right, b.right)
-        println(vertical)
-        println(horizontal)
+//        println(vertical)
+//        println(horizontal)
         return max(vertical / min(a.height(), b.height()), horizontal / min(a.width(), b.width()))
     }
 

@@ -57,7 +57,7 @@ class AddScoreViewModel(application: Application) : AndroidViewModel(application
         instrument = score.instrument
         addAndProcessSheet(*(score.sheets ?: listOf())
             .map {
-                Files.move(it.imageFile.toPath(), draftDir.resolve(it.imageFile.name)).toFile()
+                Files.copy(it.imageFile.toPath(), draftDir.resolve(it.imageFile.name)).toFile()
             }
             .toTypedArray())
     }

@@ -29,4 +29,6 @@
     <string name="chip_sort_descending">Descending</string>
     <string name="chip_sort_title">Title</string>
     <string name="chip_sort_date">Date</string>
+    <string name="icon">icon</string>
+    <string name="musicscoreapp">MusicScoreApp</string>
 </resources>

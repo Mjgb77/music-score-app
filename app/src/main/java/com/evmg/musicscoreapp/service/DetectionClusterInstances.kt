@@ -12,7 +12,7 @@ object DetectionClusterInstances {
         intArrayOf(10, 13, 16, 30, 33, 23, 30, 61, 62, 45, 59, 119, 116, 90, 156, 198, 373, 326),
         arrayOf(intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8)),
         modelFilename = "figures-192x1280-s2270e-b6-int8.tflite",
-        gpuModelFilename = "figures-192x1280-s2270e-b6-fp16.tflite",
+        gpuModelFilename = "figures-192x1280-s2270e-b6-int8.tflite",
         labelFilename = "classes.txt",
         numThreads = 4,
         confidenceThreshold = 0.5F
@@ -23,7 +23,7 @@ object DetectionClusterInstances {
 //        intArrayOf(10, 13, 16, 30, 33, 23, 30, 61, 62, 45, 59, 119, 116, 90, 156, 198, 373, 326),
         arrayOf(intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8)),
         modelFilename = "staff-544x384-s1000e-32b-int8.tflite",
-        gpuModelFilename = "staff-544x384-s1000e-32b-fp16.tflite",
+        gpuModelFilename = "staff-544x384-s1000e-32b-int8.tflite",
         labelFilename = "staff-classes.txt",
         confidenceThreshold = 0.3F,
         numThreads = 4
@@ -37,10 +37,10 @@ object DetectionClusterInstances {
             staffDetectionService.initializeCPU(context)
             figureDetectionService.initializeCPU(context)
 
-//            try {
-//                staffDetectionService.initializeGPU(context)
-//                figureDetectionService.initializeGPU(context)
-//            } catch(e: Exception) {}
+            try {
+                staffDetectionService.initializeGPU(context)
+                figureDetectionService.initializeGPU(context)
+            } catch(e: Exception) {}
         }
     }
 }

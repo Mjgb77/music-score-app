@@ -35,7 +35,7 @@ open class DetectionService(
     enum class Engine { CPU, GPU, NNAPI }
     private enum class InitializeStage { NOT_STARTED, IN_PROCESS, DONE }
 
-    private val TAG = DetectionService::class.simpleName
+    private val TAG = DetectionService::class.simpleName + "".repeat(10)
 
     private val inputSize: Size = modelFilename.split("-")[1].split("x").let { Size(it[1].toInt(), it[0].toInt()) }
     private val isQuantized = modelFilename.contains("int8")
@@ -72,6 +72,8 @@ open class DetectionService(
     // Pre-allocated buffers.
     private var labels: Array<String> = arrayOf()
     private var tfLite: Interpreter? = null
+    private val imgData = ByteBuffer.allocateDirect(1 * inputSize.width * inputSize.height * 3 * numBytesPerChannel)
+    private lateinit var outData: Array<ByteBuffer>
 
     private var inp_scale = 0f
     private var inp_zero_point = 0
@@ -128,6 +130,29 @@ open class DetectionService(
                         oup_zero_points[i] = oupten.quantizationParams().getZeroPoint()
                     }
                 }
+
+                Log.d(TAG, "Allocating buffers: " + measureTimeMillis {
+                    imgData.order(ByteOrder.nativeOrder())
+                    outData = {
+                        val outData = arrayListOf<ByteBuffer>()
+                        val shape: IntArray = tfLite!!.getOutputTensor(0).shape()
+                        val numClass = shape[shape.size - 1]
+                        for (i in masks.indices) {
+                            outData.add(
+                                ByteBuffer.allocateDirect(
+                                    1
+                                            * outputWidth.get(i).width
+                                            * outputWidth.get(i).height
+                                            * masks[i].size
+                                            * (5 + numClass)
+                                            * numBytesPerChannel
+                                )
+                            )
+                            outData.get(i).order(ByteOrder.nativeOrder())
+                        }
+                        outData.toTypedArray()
+                    }.invoke()
+                })
                 initializeStage = InitializeStage.DONE
             }
         }
@@ -284,8 +309,6 @@ open class DetectionService(
         // 1. Prepare TFLite Input
         //
         val outputMap: MutableMap<Int, Any> = HashMap()
-        val imgData = ByteBuffer.allocateDirect(1 * inputSize.width * inputSize.height * 3 * numBytesPerChannel)
-        imgData.order(ByteOrder.nativeOrder())
         Log.d(TAG, "Prepare Input and Output: " + measureTimeMillis {
 
             val intValues = IntArray(bitmap.width * bitmap.height)
@@ -308,25 +331,6 @@ open class DetectionService(
             }
 
             // Create outputArrays
-            val outData = {
-                val outData = arrayListOf<ByteBuffer>()
-                val shape: IntArray = tfLite!!.getOutputTensor(0).shape()
-                val numClass = shape[shape.size - 1]
-                for (i in masks.indices) {
-                    outData.add(
-                        ByteBuffer.allocateDirect(
-                            1
-                                    * outputWidth.get(i).width
-                                    * outputWidth.get(i).height
-                                    * masks[i].size
-                                    * (5 + numClass)
-                                    * numBytesPerChannel
-                        )
-                    )
-                    outData.get(i).order(ByteOrder.nativeOrder())
-                }
-                outData.toTypedArray()
-            }.invoke()
 
             for (i in outputWidth.indices) {
                 outData[i].rewind()
