@@ -1,0 +1,65 @@
+<vector android:height="48dp"
+    android:viewportHeight="200"
+    android:viewportWidth="140"
+    android:width="33.6dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <path android:fillColor="#00000000"
+        android:pathData="M0,185 L140,185" android:strokeColor="#000000"
+        android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,176.605 L140,176.605"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,168.21 L140,168.21"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,159.815 L140,159.815"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,151.42 L140,151.42"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,116.79 L140,116.79"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,108.395 L140,108.395"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,100 L140,100" android:strokeColor="#000000"
+        android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,91.605 L140,91.605"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,83.21 L140,83.21"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,48.58 L140,48.58"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,40.185 L140,40.185"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,31.79 L140,31.79"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000"
+        android:pathData="M0,23.395 L140,23.395"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:fillColor="#00000000" android:pathData="M0,15 L140,15"
+        android:strokeColor="#000000" android:strokeLineCap="round" android:strokeWidth="1"/>
+    <path android:pathData="M70.002,99.998m-44.999,0a45.002,44.999 89.984,1 1,89.998 0a45.002,44.999 89.984,1 1,-89.998 0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startColor="#80DEEA"
+                android:endColor="#EB1565C0"
+                android:centerX="75"
+                android:centerY="100"
+                android:gradientRadius="51"
+                android:type="radial" >
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#FF000000" android:fillType="evenOdd" android:pathData="M88.264,97.833l-22.991,-16.715c-0.844,-0.612 -1.964,-0.704 -2.889,-0.228c-0.932,0.472 -1.514,1.43 -1.514,2.465l0,33.419c0,1.047 0.582,2.001 1.514,2.473c0.394,0.199 0.825,0.298 1.26,0.298c0.567,0 1.142,-0.181 1.629,-0.538l22.991,-16.7c0.726,-0.534 1.15,-1.36 1.15,-2.237C89.417,99.178 88.983,98.356 88.264,97.833z"/>
+    <path android:fillColor="#FF000000" android:fillType="evenOdd" android:pathData="M70.004,46C40.174,46 16,70.177 16,100.011C16,129.834 40.174,154 70.004,154C99.826,154 124,129.83 124,100.011C124.004,70.177 99.826,46 70.004,46ZM70.004,144.994C45.163,144.994 25.02,124.855 25.02,100.011C25.02,75.174 45.163,55.014 70.004,55.014C94.837,55.014 114.98,75.17 114.98,100.011C114.984,124.855 94.837,144.994 70.004,144.994Z"/>
+</vector>
